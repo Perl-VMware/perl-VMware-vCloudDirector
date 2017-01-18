@@ -1,4 +1,4 @@
---maximum-line-length=120
+--maximum-line-length=100
 ##--trim-qw
 #----------------  PBP options, as listed on page 35 of PBP  ----------------
 ##-l=78   # Max line width is 78 cols

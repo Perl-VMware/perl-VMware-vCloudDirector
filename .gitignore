@@ -19,7 +19,7 @@ _build
 *.mo
 
 # avoid archives of this distribution
-Broadworks-OCIP-*
+VMware-vCloudDirector-*
 
 # stuff thats part of the build
 blib*
