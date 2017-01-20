@@ -15,9 +15,11 @@ extends 'Throwable::Error';
 
 # ------------------------------------------------------------------------
 
-has uri => (is=>'ro',isa=>'URI',documentation=>'An optional URI that was being processed');
+has uri =>
+    ( is => 'ro', isa => 'URI', documentation => 'An optional URI that was being processed' );
 
-has response => (is=>'ro',isa=>'Object',documentation=>'The response object');
+has response => ( is => 'ro', isa => 'Object', documentation => 'The response object' );
+has request  => ( is => 'ro', isa => 'Object', documentation => 'The request object' );
 
 # ------------------------------------------------------------------------
 
