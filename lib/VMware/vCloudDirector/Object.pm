@@ -53,7 +53,6 @@ around BUILDARGS => sub {
     my $class = shift;
 
     my $params = is_plain_hashref( $_[0] ) ? $_[0] : {@_};
-
     if ( $params->{hash} ) {
         my $top_hash = $params->{hash};
 

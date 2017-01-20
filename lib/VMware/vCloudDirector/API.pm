@@ -140,6 +140,7 @@ method _request ($method, $url, $content?, $headers?) {
 
     # Throw if this went wrong
     if ( $response->is_error ) {
+        ### Response: $response
         VMware::vCloudDirector::Error->throw(
             {   message  => "$method request failed",
                 uri      => $uri,
@@ -196,7 +197,7 @@ has _raw_version_full => (
     builder => '_build_raw_version_full'
 );
 
-method _build_api_version ()  { return $self->_raw_version->{Version}; }
+method _build_api_version () { return $self->_raw_version->{Version}; }
 method _build_url_login () { return URI->new( $self->_raw_version->{LoginUrl} ); }
 
 method _build_raw_version () {
@@ -245,11 +246,12 @@ method login () {
     ### vCloud authentication token: $token
 
     # we also reset the base url to match the login URL
-    $self->_set_base_url( $self->_url_login->clone->path('') );
+    ## $self->_set_base_url( $self->_url_login->clone->path('') );
 
     return VMware::vCloudDirector::Object->new(
-        hash => $self->_decode_xml_response($response),
-        api  => $self
+        {   hash => $self->_decode_xml_response($response),
+            api  => $self
+        }
     );
 }
 
