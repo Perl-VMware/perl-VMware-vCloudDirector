@@ -12,6 +12,7 @@ use Moose;
 use Method::Signatures;
 use MooseX::Types::URI qw(Uri);
 use Ref::Util qw(is_plain_hashref);
+use UUID::Tiny 1.02 qw(:std);
 use VMware::vCloudDirector::Link;
 use VMware::vCloudDirector::Error;
 
@@ -29,6 +30,7 @@ has mime_type => ( is => 'ro', isa => 'Str', required => 1 );
 has href => ( is => 'ro', isa => Uri, required => 1, coerce => 1 );
 has type => ( is => 'ro', isa => 'Str',     required  => 1 );
 has hash => ( is => 'ro', isa => 'HashRef', required  => 1 );
+has name => ( is => 'ro', isa => 'Str',     predicate => 'has_name' );
 has id   => ( is => 'ro', isa => 'Str',     predicate => 'has_id' );
 
 # ------------------------------------------------------------------------
@@ -69,8 +71,17 @@ around BUILDARGS => sub {
 
         $params->{href}      = $hash->{-href} if ( exists( $hash->{-href} ) );
         $params->{rel}       = $hash->{-rel}  if ( exists( $hash->{-rel} ) );
-        $params->{id}        = $hash->{-id}   if ( exists( $hash->{-id} ) );
+        $params->{name}      = $hash->{-name} if ( exists( $hash->{-name} ) );
         $params->{mime_type} = $hash->{-type} if ( exists( $hash->{-type} ) );
+        if ( exists( $hash->{-id} ) ) {
+            $params->{id} = $hash->{-id};
+        }
+        else {
+            if ( defined( $params->{href} ) ) {
+                my $id = substr( $params->{href}, -36 );
+                $params->{id} = $id if ( is_uuid_string($id) );
+            }
+        }
     }
 
     return $class->$orig($params);
