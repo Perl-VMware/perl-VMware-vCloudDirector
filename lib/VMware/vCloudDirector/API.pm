@@ -35,7 +35,8 @@ has default_accept_header => (
     is      => 'ro',
     isa     => 'Str',
     lazy    => 1,
-    builder => '_build_default_accept_header'
+    builder => '_build_default_accept_header',
+    clearer => '_clear_default_accept_header',
 );
 
 has _base_url => (
@@ -43,7 +44,8 @@ has _base_url => (
     isa     => 'URI',
     lazy    => 1,
     builder => '_build_base_url',
-    writer  => '_set_base_url'
+    writer  => '_set_base_url',
+    clearer => '_clear_base_url',
 );
 
 has ssl_ca_file => (
@@ -229,11 +231,20 @@ has authorization_token => (
     is        => 'ro',
     isa       => 'Str',
     writer    => '_set_authorization_token',
-    clearer   => 'clear_authorization_token',
+    clearer   => '_clear_authorization_token',
     predicate => 'has_authorization_token'
 );
 
-method login () {
+has current_session => (
+    is        => 'ro',
+    isa       => 'VMware::vCloudDirector::Object',
+    clearer   => '_clear_current_session',
+    predicate => 'has_current_session',
+    lazy      => 1,
+    builder   => '_build_current_session'
+);
+
+method _build_current_session () {
     my $login_id = join( '@', $self->username, $self->orgname );
     my $encoded_auth = 'Basic ' . MIME::Base64::encode( join( ':', $login_id, $self->password ) );
     ### vCloud attempting login as: $login_id
@@ -255,8 +266,21 @@ method login () {
     );
 }
 
+method login () { return $self->current_session; }
+
+method logout () {
+    if ( $self->has_current_session ) {
+
+        # just do this - it might fail, but little you can do now
+        try { $self->DELETE( $self->_url_login ); }
+        catch { warn "DELETE of session failed: ", @_; }
+    }
+    $self->_clear_api_data;
+}
+
 # ------------------------------------------------------------------------
 method GET ($url) {
+    $self->current_session;    # ensure/force valid session in place
     my $response = $self->_request( 'GET', $url );
     return VMware::vCloudDirector::Object->new(
         hash => $self->_decode_xml_response($response),
@@ -265,6 +289,7 @@ method GET ($url) {
 }
 
 method PUT ($url, $xml_hash) {
+    $self->current_session;    # ensure/force valid session in place
     my $content = is_plain_hashref($xml_hash) ? $self->_encode_xml_content($xml_hash) : $xml_hash;
     my $response = $self->_request( 'PUT', $url );
     return VMware::vCloudDirector::Object->new(
@@ -274,6 +299,7 @@ method PUT ($url, $xml_hash) {
 }
 
 method POST ($url, $xml_hash) {
+    $self->current_session;    # ensure/force valid session in place
     my $content = is_plain_hashref($xml_hash) ? $self->_encode_xml_content($xml_hash) : $xml_hash;
     my $response = $self->_request( 'POST', $url );
     return VMware::vCloudDirector::Object->new(
@@ -283,11 +309,35 @@ method POST ($url, $xml_hash) {
 }
 
 method DELETE ($url) {
+    $self->current_session;    # ensure/force valid session in place
     my $response = $self->_request( 'DELETE', $url );
     return VMware::vCloudDirector::Object->new(
         hash => $self->_decode_xml_response($response),
         api  => $self
     );
+}
+
+# ------------------------------------------------------------------------
+
+=head2 _clear_api_data
+
+Clears out all the API state data, including the current login state.  This is
+not intended to be used from outside the module, and will completely trash the
+current state requiring a new login.  The basic information passed at object
+construction time is not deleted, so a new session could be created.
+
+=cut
+
+method _clear_api_data () {
+    $self->_clear_default_accept_header;
+    $self->_clear_base_url;
+    $self->_clear_ua;
+    $self->_clear_api_version;
+    $self->_clear_url_login;
+    $self->_clear_raw_version;
+    $self->_clear_raw_version_full;
+    $self->_clear_authorization_token;
+    $self->_clear_current_session;
 }
 
 # ------------------------------------------------------------------------
