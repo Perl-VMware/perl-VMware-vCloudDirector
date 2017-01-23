@@ -316,16 +316,13 @@ method _build_returned_objects ($response) {
         if (    ( scalar(@top_keys) == 1 )
             and ( substr( $top_key, -4, 4 ) eq 'List' )
             and is_plain_hashref( $hash->{$top_key} )
-            and ( scalar( keys %{ $hash->{$top_key} } ) == 1 ) ) {
+            and ( exists( $hash->{$top_key}{$thing_type} ) ) ) {
             my @thing_objects;
             $self->_debug("API: building a set of [$thing_type] objects") if ( $self->debug );
             foreach my $thing ( $self->_listify( $hash->{$top_key}{$thing_type} ) ) {
-                push @thing_objects,
-                    VMware::vCloudDirector::Object->new(
-                    {   hash => { $thing_type => $thing },
-                        api  => $self
-                    }
-                    );
+                my $object = VMware::vCloudDirector::Object->new(
+                    { hash => { $thing_type => $thing }, api => $self } );
+                push @thing_objects, $object;
             }
             return @thing_objects;
         }
