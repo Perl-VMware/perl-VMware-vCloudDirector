@@ -15,7 +15,6 @@ use MooseX::Types::Path::Tiny qw/Path/;
 use Mozilla::CA;
 use Path::Tiny;
 use Ref::Util qw(is_plain_hashref);
-use Smart::Comments;
 use Syntax::Keyword::Try;
 use VMware::vCloudDirector::Error;
 use VMware::vCloudDirector::Object;
@@ -59,6 +58,7 @@ has ssl_ca_file => (
 method _build_ssl_ca_file () { return path( Mozilla::CA::SSL_ca_file() ); }
 method _build_base_url () { return URI->new( sprintf( 'https://%s/', $self->hostname ) ); }
 method _build_default_accept_header () { return ( 'application/*+xml;version=' . $self->api_version ); }
+method _debug (@parameters) { warn join( '', '# ', @parameters, "\n" ) if ( $self->debug ); }
 
 # ------------------------------------------------------------------------
 has _ua => (
@@ -99,8 +99,8 @@ method _encode_xml_content ($hash) {
 # ------------------------------------------------------------------------
 method _request ($method, $url, $content?, $headers?) {
     my $uri = URI->new_abs( $url, $self->_base_url );
-    ### Method:  $method
-    ### URI:     $uri
+    $self->_debug("API: _request [$method] $uri") if ( $self->debug );
+
     my $request = HTTP::Request->new( $method => $uri );
 
     # build headers
@@ -142,7 +142,6 @@ method _request ($method, $url, $content?, $headers?) {
 
     # Throw if this went wrong
     if ( $response->is_error ) {
-        ### Response: $response
         VMware::vCloudDirector::Error->throw(
             {   message  => "$method request failed",
                 uri      => $uri,
@@ -214,8 +213,7 @@ method _build_raw_version () {
         }
     }
 
-    ### vCloud API version seen: $version
-    ### vCloud API version block: $version_block
+    $self->_debug("API: version used: $version") if ( $self->debug );
     die "No valid version block seen" unless ($version_block);
 
     return $version_block;
@@ -247,14 +245,14 @@ has current_session => (
 method _build_current_session () {
     my $login_id = join( '@', $self->username, $self->orgname );
     my $encoded_auth = 'Basic ' . MIME::Base64::encode( join( ':', $login_id, $self->password ) );
-    ### vCloud attempting login as: $login_id
+    $self->_debug("API: attempting login as: $login_id") if ( $self->debug );
     my $response =
         $self->_request( 'POST', $self->_url_login, undef, { Authorization => $encoded_auth } );
 
     # if we got here then it succeeded, since we throw on failure
     my $token = $response->header('x-vcloud-authorization');
     $self->_set_authorization_token($token);
-    ### vCloud authentication token: $token
+    $self->_debug("API: authentication token: $token") if ( $self->debug );
 
     # we also reset the base url to match the login URL
     ## $self->_set_base_url( $self->_url_login->clone->path('') );
