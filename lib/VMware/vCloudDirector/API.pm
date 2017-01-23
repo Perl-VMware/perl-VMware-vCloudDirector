@@ -28,6 +28,7 @@ has username   => ( is => 'ro', isa => 'Str',  required => 1 );
 has password   => ( is => 'ro', isa => 'Str',  required => 1 );
 has orgname    => ( is => 'ro', isa => 'Str',  required => 1, default => 'System' );
 has ssl_verify => ( is => 'ro', isa => 'Bool', default  => 1 );
+has debug      => ( is => 'rw', isa => 'Int',  default  => 0, );
 has timeout => ( is => 'rw', isa => 'Int', default => 120 );    # Defaults to 120 seconds
 
 has default_accept_header => (
@@ -58,6 +59,7 @@ has ssl_ca_file => (
 method _build_ssl_ca_file () { return path( Mozilla::CA::SSL_ca_file() ); }
 method _build_base_url () { return URI->new( sprintf( 'https://%s/', $self->hostname ) ); }
 method _build_default_accept_header () { return ( 'application/*+xml;version=' . $self->api_version ); }
+method _debug (@parameters) { warn join( '', '# ', @parameters, "\n" ) if ( $self->debug ); }
 
 # ------------------------------------------------------------------------
 
@@ -66,20 +68,17 @@ method _build_default_accept_header () { return ( 'application/*+xml;version=' .
 Set debug level.  The higher the debug level, the more chatter is exposed.
 
 Defaults to 0 (no output) unless the environment variable C<VCLOUD_API_DEBUG>
-is set to something that is non-zero.
+is set to something that is non-zero.  Picked up at create time in C<BUILD()>
 
 =cut
 
-has debug => ( is => 'rw', isa => 'Int', lazy => 1, builder => '_build_debug', );
-method _debug (@parameters) { warn join( '', '# ', @parameters, "\n" ) if ( $self->debug ); }
+method BUILD ($args) {
 
-method _build_debug () {
-    our %ENV;
-
-    if ( exists( $ENV{VCLOUD_API_DEBUG} ) and length( $ENV{VCLOUD_API_DEBUG} ) ) {
-        return looks_like_number( $ENV{VCLOUD_API_DEBUG} ) ? $ENV{VCLOUD_API_DEBUG} : 1;
+    # deal with setting debug if needed
+    my $env_debug = $ENV{VCLOUD_API_DEBUG};
+    if ( defined($env_debug) ) {
+        $self->debug($env_debug) if ( looks_like_number($env_debug) );
     }
-    return 0;
 }
 
 # ------------------------------------------------------------------------
