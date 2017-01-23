@@ -102,7 +102,9 @@ method _build_ua () {
 # ------------------------------------------------------------------------
 method _decode_xml_response ($response) {
     try {
-        return XML::Fast::xml2hash( $response->content );
+        my $xml = $response->decoded_content;
+        return unless ( defined($xml) and length($xml) );
+        return XML::Fast::xml2hash($xml);
     }
     catch {
         VMware::vCloudDirector::Error->throw(
@@ -220,7 +222,7 @@ has _raw_version_full => (
     builder => '_build_raw_version_full'
 );
 
-method _build_api_version () { return $self->_raw_version->{Version}; }
+method _build_api_version ()  { return $self->_raw_version->{Version}; }
 method _build_url_login () { return URI->new( $self->_raw_version->{LoginUrl} ); }
 
 method _build_raw_version () {
@@ -279,11 +281,8 @@ method _build_current_session () {
     # we also reset the base url to match the login URL
     ## $self->_set_base_url( $self->_url_login->clone->path('') );
 
-    return VMware::vCloudDirector::Object->new(
-        {   hash => $self->_decode_xml_response($response),
-            api  => $self
-        }
-    );
+    my ($session) = $self->_build_returned_objects($response);
+    return $session;
 }
 
 method login () { return $self->current_session; }
@@ -299,42 +298,82 @@ method logout () {
 }
 
 # ------------------------------------------------------------------------
+method _build_returned_objects ($response) {
+
+    if ( $response->is_success ) {
+        $self->_debug("API: building objects") if ( $self->debug );
+
+        my $hash = $self->_decode_xml_response($response);
+        unless ( defined($hash) ) {
+            $self->_debug("API: returned null object") if ( $self->debug );
+            return;
+        }
+
+        # See if this is a list of things, in which case root element will
+        # be ThingList and it will have a set of Thing in it
+        my @top_keys   = keys %{$hash};
+        my $top_key    = $top_keys[0];
+        my $thing_type = substr( $top_key, 0, -4 );
+        if (    ( scalar(@top_keys) == 1 )
+            and ( substr( $top_key, -4, 4 ) eq 'List' )
+            and is_plain_hashref( $hash->{$top_key} )
+            and ( scalar( keys %{ $hash->{$top_key} } ) == 1 ) ) {
+            my @thing_objects;
+            $self->_debug("API: building a set of [$thing_type] objects") if ( $self->debug );
+            foreach my $thing ( $self->_listify( $hash->{$top_key}{$thing_type} ) ) {
+                push @thing_objects,
+                    VMware::vCloudDirector::Object->new(
+                    {   hash => { $thing_type => $thing },
+                        api  => $self
+                    }
+                    );
+            }
+            return @thing_objects;
+        }
+
+        # was not a list of things, so just objectify the one thing here
+        else {
+            $self->_debug("API: building a single [$top_key] object") if ( $self->debug );
+            return VMware::vCloudDirector::Object->new(
+                {   hash => $hash,
+                    api  => $self
+                }
+            );
+        }
+    }
+
+    # there was an error here - so bomb out
+    else {
+        VMware::vCloudDirector::Error->throw(
+            { message => 'Error reponse passed to object builder', response => $response } );
+    }
+}
+
+# ------------------------------------------------------------------------
 method GET ($url) {
     $self->current_session;    # ensure/force valid session in place
     my $response = $self->_request( 'GET', $url );
-    return VMware::vCloudDirector::Object->new(
-        hash => $self->_decode_xml_response($response),
-        api  => $self
-    );
+    return $self->_build_returned_objects($response);
 }
 
 method PUT ($url, $xml_hash) {
     $self->current_session;    # ensure/force valid session in place
     my $content = is_plain_hashref($xml_hash) ? $self->_encode_xml_content($xml_hash) : $xml_hash;
     my $response = $self->_request( 'PUT', $url );
-    return VMware::vCloudDirector::Object->new(
-        hash => $self->_decode_xml_response($response),
-        api  => $self
-    );
+    return $self->_build_returned_objects($response);
 }
 
 method POST ($url, $xml_hash) {
     $self->current_session;    # ensure/force valid session in place
     my $content = is_plain_hashref($xml_hash) ? $self->_encode_xml_content($xml_hash) : $xml_hash;
     my $response = $self->_request( 'POST', $url );
-    return VMware::vCloudDirector::Object->new(
-        hash => $self->_decode_xml_response($response),
-        api  => $self
-    );
+    return $self->_build_returned_objects($response);
 }
 
 method DELETE ($url) {
     $self->current_session;    # ensure/force valid session in place
     my $response = $self->_request( 'DELETE', $url );
-    return VMware::vCloudDirector::Object->new(
-        hash => $self->_decode_xml_response($response),
-        api  => $self
-    );
+    return $self->_build_returned_objects($response);
 }
 
 # ------------------------------------------------------------------------
@@ -359,6 +398,9 @@ method _clear_api_data () {
     $self->_clear_authorization_token;
     $self->_clear_current_session;
 }
+
+# ------------------------------------------------------------------------
+method _listify ($thing) { !defined $thing ? () : ( ( ref $thing eq 'ARRAY' ) ? @{$thing} : $thing ) }
 
 # ------------------------------------------------------------------------
 
