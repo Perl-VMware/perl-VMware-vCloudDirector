@@ -39,6 +39,10 @@ subtest 'Connection test with correct parameters' => sub {
     lives_ok( sub { $session = $vcd->api->login }, 'Login did not die' );
     isa_ok( $session, 'VMware::vCloudDirector::Object', 'Got an object back from login' );
     is( $session->type, 'Session', 'The object is a Session' );
+    my $org_list = $vcd->org_list;
+    is( ref($org_list), 'ARRAY', 'Org list is an array reference' );
+    isa_ok( $org_list->[0], 'VMware::vCloudDirector::Object', 'Org list object is the right type' );
+    is( $org_list->[0]->type, 'Org', 'Org list object is an Org object' );
     done_testing();
 };
 

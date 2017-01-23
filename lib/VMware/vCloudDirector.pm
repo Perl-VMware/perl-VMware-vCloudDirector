@@ -13,11 +13,9 @@ use Method::Signatures;
 use MooseX::Types::Path::Tiny qw/Path/;
 use Mozilla::CA;
 use Path::Tiny;
-use Ref::Util qw(is_plain_hashref);
-use Smart::Comments;
-use Syntax::Keyword::Try;
-use VMware::vCloudDirector::Error;
 use VMware::vCloudDirector::API;
+use VMware::vCloudDirector::Error;
+use VMware::vCloudDirector::Object;
 
 # ------------------------------------------------------------------------
 
@@ -57,6 +55,15 @@ method _build_api () {
         ssl_ca_file => $self->ssl_ca_file,
     );
 }
+
+# ------------------------------------------------------------------------
+has org_list => (
+    is      => 'ro',
+    isa     => 'ArrayRef[VMware::vCloudDirector::Object]',
+    lazy    => 1,
+    builder => '_build_org_list'
+);
+method _build_org_list { return [ $self->api->GET('/api/org/') ]; }
 
 # ------------------------------------------------------------------------
 
