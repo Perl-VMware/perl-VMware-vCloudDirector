@@ -33,4 +33,7 @@ META.yml
 tmp
 .tidyall.d
 
+# Exclude file used to set up testing holding auth data
+testauth*.sh
+
 # end
