@@ -26,8 +26,9 @@ has object => (
 
 has mime_type => ( is => 'ro', isa => 'Str', predicate => 'has_mime_type' );
 has href => ( is => 'ro', isa => Uri, required => 1, coerce => 1 );
-has rel => ( is => 'ro', isa => 'Str', required => 1 );
-has type => ( is => 'ro', isa => 'Str', lazy => 1, builder => '_build_type' );
+has rel  => ( is => 'ro', isa => 'Str', required  => 1 );
+has name => ( is => 'ro', isa => 'Str', predicate => 'has_name' );
+has type => ( is => 'ro', isa => 'Str', lazy      => 1, builder => '_build_type' );
 
 method _build_type () {
     VMware::vCloudDirector::Error->throw("Type not set") unless ( $self->has_mime_type );
@@ -40,15 +41,15 @@ method _build_type () {
 
 # ------------------------------------------------------------------------
 around BUILDARGS => sub {
-    my $orig  = shift;
-    my $class = shift;
+    my ( $orig, $class, $first, @rest ) = @_;
 
-    my $params = is_plain_hashref( $_[0] ) ? $_[0] : {@_};
+    my $params = is_plain_hashref($first) ? $first : { $first, @rest };
 
     if ( $params->{hash} ) {
         my $hash = delete $params->{hash};
         $params->{href}      = $hash->{-href} if ( exists( $hash->{-href} ) );
         $params->{rel}       = $hash->{-rel}  if ( exists( $hash->{-rel} ) );
+        $params->{name}      = $hash->{-name} if ( exists( $hash->{-name} ) );
         $params->{mime_type} = $hash->{-type} if ( exists( $hash->{-type} ) );
     }
 

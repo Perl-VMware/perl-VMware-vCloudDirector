@@ -37,6 +37,7 @@ has _partial_object => ( is => 'rw', isa => 'Bool', default => 0 );
 # delegates that force a full object to be pulled
 method hash () { return $self->inflate->content->hash; }
 method links () { return $self->inflate->content->links; }
+method find_link (@args) { return $self->inflate->content->find_link(@args); }
 method id () { return $self->inflate->content->id; }
 
 # ------------------------------------------------------------------------

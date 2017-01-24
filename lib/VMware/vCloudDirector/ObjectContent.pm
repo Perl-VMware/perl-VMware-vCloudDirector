@@ -49,6 +49,26 @@ method _build_links () {
 }
 
 # ------------------------------------------------------------------------
+
+=head2 find_link
+
+Returns the first link found that matches the search criteria
+
+=cut
+
+method find_link (:$name, :$type, :$rel) {
+    foreach my $link ( @{ $self->links } ) {
+        if ( not( defined($rel) ) or ( $rel eq ( $link->rel || '' ) ) ) {
+            if ( not( defined($type) ) or ( $type eq ( $link->type || '' ) ) ) {
+                if ( not( defined($name) ) or ( $name eq ( $link->name || '' ) ) ) {
+                    return $link;
+                }
+            }
+        }
+    }
+}
+
+# ------------------------------------------------------------------------
 around BUILDARGS => sub {
     my ( $orig, $class, $first, @rest ) = @_;
 
