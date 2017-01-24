@@ -43,6 +43,11 @@ subtest 'Connection test with correct parameters' => sub {
     is( ref($org_list), 'ARRAY', 'Org list is an array reference' );
     isa_ok( $org_list->[0], 'VMware::vCloudDirector::Object', 'Org list object is the right type' );
     is( $org_list->[0]->type, 'Org', 'Org list object is an Org object' );
+    ok( ( scalar( @{$org_list} ) > 1 ), 'Org list has multiple entries (needed for System)' );
+    my ($sysorg) = grep { $_->name eq 'System' } @{$org_list};
+    ok( defined($sysorg), 'System org has been found' );
+    isa_ok( $sysorg, 'VMware::vCloudDirector::Object', 'System org object is the right type' );
+    is( $sysorg->type, 'Org', 'System org object is an Org object' );
     done_testing();
 };
 
