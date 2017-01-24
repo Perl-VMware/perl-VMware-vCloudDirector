@@ -321,7 +321,10 @@ method _build_returned_objects ($response) {
             $self->_debug("API: building a set of [$thing_type] objects") if ( $self->debug );
             foreach my $thing ( $self->_listify( $hash->{$top_key}{$thing_type} ) ) {
                 my $object = VMware::vCloudDirector::Object->new(
-                    { hash => { $thing_type => $thing }, api => $self } );
+                    hash            => { $thing_type => $thing },
+                    api             => $self,
+                    _partial_object => 1
+                );
                 push @thing_objects, $object;
             }
             return @thing_objects;
@@ -330,11 +333,7 @@ method _build_returned_objects ($response) {
         # was not a list of things, so just objectify the one thing here
         else {
             $self->_debug("API: building a single [$top_key] object") if ( $self->debug );
-            return VMware::vCloudDirector::Object->new(
-                {   hash => $hash,
-                    api  => $self
-                }
-            );
+            return VMware::vCloudDirector::Object->new( hash => $hash, api => $self );
         }
     }
 

@@ -1,6 +1,6 @@
 package VMware::vCloudDirector::Object;
 
-# ABSTRACT: Module to do stuff!
+# ABSTRACT: Module to contain an object!
 
 use strict;
 use warnings;
@@ -10,11 +10,8 @@ use warnings;
 
 use Moose;
 use Method::Signatures;
-use MooseX::Types::URI qw(Uri);
 use Ref::Util qw(is_plain_hashref);
-use UUID::Tiny 1.02 qw(:std);
-use VMware::vCloudDirector::Link;
-use VMware::vCloudDirector::Error;
+use VMware::vCloudDirector::ObjectContent;
 
 # ------------------------------------------------------------------------
 
@@ -26,69 +23,42 @@ has api => (
     documentation => 'API we use'
 );
 
-has mime_type => ( is => 'ro', isa => 'Str', required => 1 );
-has href => ( is => 'ro', isa => Uri, required => 1, coerce => 1 );
-has type => ( is => 'ro', isa => 'Str',     required  => 1 );
-has hash => ( is => 'ro', isa => 'HashRef', required  => 1 );
-has name => ( is => 'ro', isa => 'Str',     predicate => 'has_name' );
-has id   => ( is => 'ro', isa => 'Str',     predicate => 'has_id' );
-
-# ------------------------------------------------------------------------
-
-has links => (
-    is      => 'ro',
-    isa     => 'ArrayRef[VMware::vCloudDirector::Link]',
-    lazy    => 1,
-    builder => '_build_links'
+has content => (
+    is            => 'ro',
+    isa           => 'VMware::vCloudDirector::ObjectContent',
+    predicate     => 'has_content',
+    writer        => '_set_content',
+    documentation => 'The underlying content object',
+    handles       => [qw( mime_type href type name )],
 );
 
-method _build_links () {
-    my @links;
-    push( @links, VMware::vCloudDirector::Link->new( hash => $_, object => $self ) )
-        foreach ( $self->_listify( $self->hash->{Link} ) );
-    return \@links;
+has _partial_object => ( is => 'rw', isa => 'Bool', default => 0 );
+
+# delegates that force a full object to be pulled
+method hash () { return $self->inflate->content->hash; }
+method links () { return $self->inflate->content->links; }
+method id () { return $self->inflate->content->id; }
+
+# ------------------------------------------------------------------------
+method BUILD ($args) {
+
+    $self->_set_content(
+        VMware::vCloudDirector::ObjectContent->new( object => $self, hash => $args->{hash} ) );
 }
 
 # ------------------------------------------------------------------------
-around BUILDARGS => sub {
-    my $orig  = shift;
-    my $class = shift;
-
-    my $params = is_plain_hashref( $_[0] ) ? $_[0] : {@_};
-    if ( $params->{hash} ) {
-        my $top_hash = $params->{hash};
-
-        my $hash;
-        if ( scalar( keys %{$top_hash} ) == 1 ) {
-            my $type = ( keys %{$top_hash} )[0];
-            $hash           = $top_hash->{$type};
-            $params->{type} = $type;
-            $params->{hash} = $hash;
-        }
-        else {
-            $hash = $top_hash;
-        }
-
-        $params->{href}      = $hash->{-href} if ( exists( $hash->{-href} ) );
-        $params->{rel}       = $hash->{-rel}  if ( exists( $hash->{-rel} ) );
-        $params->{name}      = $hash->{-name} if ( exists( $hash->{-name} ) );
-        $params->{mime_type} = $hash->{-type} if ( exists( $hash->{-type} ) );
-        if ( exists( $hash->{-id} ) ) {
-            $params->{id} = $hash->{-id};
-        }
-        else {
-            if ( defined( $params->{href} ) ) {
-                my $id = substr( $params->{href}, -36 );
-                $params->{id} = $id if ( is_uuid_string($id) );
-            }
-        }
-    }
-
-    return $class->$orig($params);
-};
+method inflate () {
+    $self->refetch if ( $self->_partial_object );
+    return $self;
+}
 
 # ------------------------------------------------------------------------
-method _listify ($thing) { !defined $thing ? () : ( ( ref $thing eq 'ARRAY' ) ? @{$thing} : $thing ) }
+method refetch () {
+    my ($new) = $self->api->GET( $self->href );
+    $self->_set_content( $new->content );
+    $self->_partial_object(0);
+    return $self;
+}
 
 # ------------------------------------------------------------------------
 
