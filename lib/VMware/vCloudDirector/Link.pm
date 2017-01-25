@@ -85,8 +85,8 @@ method GET () { return $self->object->api->GET( $self->href ); }
 
 =head3 POST
 
-Make a post request with the specified payload to the URL in this link. 
-Returns Objects.  Failure will generate an exception.  See
+Make a post request with the specified payload to the URL in this link. Returns
+Objects.  Failure will generate an exception.  See
 L<VMware::vCloudDirector::API/POST>.
 
 =cut
