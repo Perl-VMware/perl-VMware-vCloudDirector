@@ -32,9 +32,16 @@ has type => ( is => 'ro', isa => 'Str', lazy      => 1, builder => '_build_type'
 
 method _build_type () {
     VMware::vCloudDirector::Error->throw("Type not set") unless ( $self->has_mime_type );
+
     my $type = $self->mime_type;
     if ( $type =~ m|^\Qapplication/vnd.vmware.vcloud.query.\E(.*)\Q+xml\E$| ) {
-        return $1;
+        return ( 'Query/' . $1 );
+    }
+    elsif ( $type =~ m|^\Qapplication/vnd.vmware.admin.\E(.*)\Q+xml\E$| ) {
+        return ( 'Admin/' . $1 );
+    }
+    elsif ( $type =~ m|^\Qapplication/vnd.vmware.vcloud.\E(.*)\Q+xml\E$| ) {
+        return ($1);
     }
     VMware::vCloudDirector::Error->throw("Type $type does not match expected pattern");
 }
