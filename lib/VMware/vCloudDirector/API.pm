@@ -351,6 +351,12 @@ method GET ($url) {
     return $self->_build_returned_objects($response);
 }
 
+method GET_hash ($url) {
+    $self->current_session;    # ensure/force valid session in place
+    my $response = $self->_request( 'GET', $url );
+    return $self->_decode_xml_response($response);
+}
+
 method PUT ($url, $xml_hash) {
     $self->current_session;    # ensure/force valid session in place
     my $content = is_plain_hashref($xml_hash) ? $self->_encode_xml_content($xml_hash) : $xml_hash;

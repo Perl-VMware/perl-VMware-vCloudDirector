@@ -55,8 +55,9 @@ method inflate () {
 
 # ------------------------------------------------------------------------
 method refetch () {
-    my ($new) = $self->api->GET( $self->href );
-    $self->_set_content( $new->content );
+    my $hash = $self->api->GET_hash( $self->href );
+    $self->_set_content(
+        VMware::vCloudDirector::ObjectContent->new( object => $self, hash => $hash ) );
     $self->_partial_object(0);
     return $self;
 }
