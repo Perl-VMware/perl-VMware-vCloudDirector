@@ -65,6 +65,46 @@ around BUILDARGS => sub {
 
 # ------------------------------------------------------------------------
 
+=head3 DELETE
+
+Make a delete request to the URL in this link.  Returns Objects.  Failure will
+generate an exception.  See L<VMware::vCloudDirector::API/DELETE>.
+
+=cut
+
+method DELETE () { return $self->object->api->GET( $self->href ); }
+
+=head3 GET
+
+Make a get request to the URL in this link.  Returns Objects.  Failure will
+generate an exception.  See L<VMware::vCloudDirector::API/GET>.
+
+=cut
+
+method GET () { return $self->object->api->GET( $self->href ); }
+
+=head3 POST
+
+Make a post request with the specified payload to the URL in this link. 
+Returns Objects.  Failure will generate an exception.  See
+L<VMware::vCloudDirector::API/POST>.
+
+=cut
+
+method POST ($xml_hash) { return $self->object->api->GET( $self->href, $xml_hash ); }
+
+=head3 PUT
+
+Make a put request with the specified payload to the URL in this link.  Returns
+Objects.  Failure will generate an exception.  See
+L<VMware::vCloudDirector::API/PUT>.
+
+=cut
+
+method PUT ($xml_hash) { return $self->object->api->GET( $self->href, $xml_hash ); }
+
+# ------------------------------------------------------------------------
+
 __PACKAGE__->meta->make_immutable;
 
 1;
