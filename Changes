@@ -1,5 +1,7 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+0.001     2017-01-25 15:42:10+00:00 Europe/London
     - Initial partial functionality release
       This is purely to allow me to test against consumer modules.
