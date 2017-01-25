@@ -43,7 +43,7 @@ subtest 'Connection test with correct parameters' => sub {
     my $myorg = $org_list->[0];
     isa_ok( $myorg, 'VMware::vCloudDirector::Object', 'Org object is the right type' );
     is( $myorg->type, 'Org', 'Org object is an Org object' );
-    is( $myorg->name, $org,  'Org object is an Org object' );
+    is( $myorg->name, $org,  'Org object matches our Org' );
     done_testing();
 };
 

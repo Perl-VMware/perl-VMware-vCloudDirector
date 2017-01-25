@@ -48,6 +48,12 @@ subtest 'Connection test with correct parameters' => sub {
     ok( defined($sysorg), 'System org has been found' );
     isa_ok( $sysorg, 'VMware::vCloudDirector::Object', 'System org object is the right type' );
     is( $sysorg->type, 'Org', 'System org object is an Org object' );
+    my @catlinks = $sysorg->find_links( rel => 'down', type => 'catalog' );
+    ok( scalar(@catlinks), 'At least one catalog link has been found' );
+    my $catlink = $catlinks[0];
+    isa_ok( $catlink, 'VMware::vCloudDirector::Link', 'Link object is the right type' );
+    my $catalog = [ $catlink->GET() ];
+    ok( scalar( @{$catlink} ), 'At least one catalog item has been retrieved' );
     done_testing();
 };
 
