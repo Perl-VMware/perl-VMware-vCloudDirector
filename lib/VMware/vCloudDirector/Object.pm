@@ -11,6 +11,7 @@ use warnings;
 use Moose;
 use Method::Signatures;
 use Ref::Util qw(is_plain_hashref);
+use Lingua::EN::Inflexion;
 use VMware::vCloudDirector::ObjectContent;
 
 # ------------------------------------------------------------------------
@@ -122,6 +123,37 @@ method fetch_links (@search_items) {
 
 # ------------------------------------------------------------------------
 
+=head3 build_sub_objects
+
+Given a type (specifically a key used within the current object hash), grabs
+the descendants of that key and instantiates them as partial objects (they can
+then be inflated into full objects).
+
+Due to the structure of the XML there will always be two layers, the inner
+named singular thing, and the outer named as the plural of thing.  Hence this
+does magic with the language inflection module.
+
+=cut
+
+method build_sub_objects ($type) {
+    my @objects;
+    my $container_type = noun($type)->plural;
+    return unless exists( $self->hash->{$container_type} );
+    foreach my $thing ( $self->_listify( $self->hash->{$container_type}{$type} ) ) {
+        my $object = VMware::vCloudDirector::Object->new(
+            hash            => { $type => $thing },
+            api             => $self->api,
+            _partial_object => 1
+        );
+        $self->api->_debug( 'Object: instantiated a stub for ' . $object->type )
+            if ( $self->api->debug );
+        push( @objects, $object );
+    }
+    return @objects;
+}
+
+# ------------------------------------------------------------------------
+
 =head3 DELETE
 
 Make a delete request to the URL of this object.  Returns Objects.  Failure
@@ -159,6 +191,9 @@ L<VMware::vCloudDirector::API/PUT>.
 =cut
 
 method PUT ($xml_hash) { return $self->api->GET( $self->href, $xml_hash ); }
+
+# ------------------------------------------------------------------------
+method _listify ($thing) { !defined $thing ? () : ( ( ref $thing eq 'ARRAY' ) ? @{$thing} : $thing ) }
 
 # ------------------------------------------------------------------------
 
