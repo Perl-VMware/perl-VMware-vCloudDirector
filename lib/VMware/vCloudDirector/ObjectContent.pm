@@ -11,6 +11,7 @@ use warnings;
 use Moose;
 use Method::Signatures;
 use MooseX::Types::URI qw(Uri);
+use Const::Fast;
 use Ref::Util qw(is_plain_hashref);
 use VMware::vCloudDirector::Link;
 
@@ -58,13 +59,13 @@ around BUILDARGS => sub {
         my $hash;
         if ( scalar( keys %{$top_hash} ) == 1 ) {
             my $type = ( keys %{$top_hash} )[0];
-            $hash           = $top_hash->{$type};
+            $hash = $top_hash->{$type};
             $params->{type} = $type;
-            $params->{hash} = $hash;
         }
         else {
             $hash = $top_hash;
         }
+        const $params->{hash} => $hash;    # force hash read-only to stop people playing
 
         $params->{href} = $hash->{-href} if ( exists( $hash->{-href} ) );
         $params->{rel}  = $hash->{-rel}  if ( exists( $hash->{-rel} ) );
