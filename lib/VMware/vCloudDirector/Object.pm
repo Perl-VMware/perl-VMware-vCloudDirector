@@ -72,9 +72,7 @@ Returns any links found that match the search criteria
 method find_links (:$name, :$type, :$rel) {
     my @matched_links;
     my $links = $self->links;
-    foreach my $link ($links) {
-
-        #foreach my $link ( @{ $self->links } ) {
+    foreach my $link ( @{$links} ) {
         if ( not( defined($rel) ) or ( $rel eq ( $link->rel || '' ) ) ) {
             if ( not( defined($type) ) or ( $type eq ( $link->type || '' ) ) ) {
                 if ( not( defined($name) ) or ( $name eq ( $link->name || '' ) ) ) {
