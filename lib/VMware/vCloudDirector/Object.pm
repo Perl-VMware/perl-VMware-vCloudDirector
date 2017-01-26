@@ -63,9 +63,28 @@ method refetch () {
 
 # ------------------------------------------------------------------------
 
-=head2 find_links
+=head3 find_links
 
-Returns any links found that match the search criteria
+Returns any links found that match the search criteria.  The possible criteria
+are:-
+
+=over 4
+
+=item name
+
+The name of the link
+
+=item type
+
+The type of the link (short type, not full MIME type)
+
+=item rel
+
+The rel of the link
+
+=back
+
+The return value is a list of link objects.
 
 =cut
 
@@ -82,6 +101,23 @@ method find_links (:$name, :$type, :$rel) {
         }
     }
     return @matched_links;
+}
+
+# ------------------------------------------------------------------------
+
+=head3 fetch_links
+
+As per L</find_links> except that each link found is fetched and expanded up as
+an object.
+
+=cut
+
+method fetch_links (@search_items) {
+    my @matched_objects;
+    foreach my $link ( $self->find_links(@search_items) ) {
+        push( @matched_objects, $link->GET() );
+    }
+    return @matched_objects;
 }
 
 # ------------------------------------------------------------------------
