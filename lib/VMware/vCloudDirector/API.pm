@@ -230,7 +230,7 @@ method _build_raw_version () {
     my $version = 0;
     my $version_block;
     for my $verblock ( @{ $hash->{SupportedVersions}{VersionInfo} } ) {
-        next unless ( $verblock->{-deprecated} eq 'false' );
+        next if ( ( $verblock->{-deprecated} || '' ) eq 'true' );
         if ( $verblock->{Version} > $version ) {
             $version_block = $verblock;
             $version       = $verblock->{Version};
