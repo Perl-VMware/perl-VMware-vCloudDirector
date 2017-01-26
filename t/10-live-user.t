@@ -36,13 +36,12 @@ subtest 'Connection test with correct parameters' => sub {
     ok( ( $vcd->api->api_version > 1.0 ), 'API version seen and more than 1.0' );
     my $session = $vcd->api->login;
     isa_ok( $session, 'VMware::vCloudDirector::Object', 'Got an object back from login' );
-    is( $session->type, 'Session', 'The object is a Session' );
-    my $org_list = $vcd->org_list;
-    is( ref($org_list), 'ARRAY', 'Org list is an array reference' );
-    ok( ( scalar( @{$org_list} ) == 1 ), 'Org list has single item (expected for User)' );
-    my $myorg = $org_list->[0];
+    is( $session->type, 'session', 'The object is a session' );
+    my @org_list = $vcd->org_list;
+    ok( ( scalar(@org_list) == 1 ), 'Org list has single item (expected for User)' );
+    my $myorg = $org_list[0];
     isa_ok( $myorg, 'VMware::vCloudDirector::Object', 'Org object is the right type' );
-    is( $myorg->type, 'Org', 'Org object is an Org object' );
+    is( $myorg->type, 'org', 'Org object is an Org object' );
     is( $myorg->name, $org,  'Org object matches our Org' );
     done_testing();
 };
