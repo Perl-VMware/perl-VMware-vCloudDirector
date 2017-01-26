@@ -11,7 +11,8 @@ use warnings;
 use Moose;
 use Method::Signatures;
 use MIME::Base64;
-use MooseX::Types::Path::Tiny qw/Path/;
+use MooseX::Types::Path::Tiny qw(Path);
+use MooseX::Types::URI qw(Uri);
 use Mozilla::CA;
 use Path::Tiny;
 use Ref::Util qw(is_plain_hashref);
@@ -41,7 +42,7 @@ has default_accept_header => (
 
 has _base_url => (
     is      => 'ro',
-    isa     => 'URI',
+    isa     => Uri,
     lazy    => 1,
     builder => '_build_base_url',
     writer  => '_set_base_url',
@@ -201,7 +202,7 @@ has api_version => (
 );
 has _url_login => (
     is      => 'rw',
-    isa     => 'URI',
+    isa     => Uri,
     lazy    => 1,
     clearer => '_clear_url_login',
     builder => '_build_url_login'
