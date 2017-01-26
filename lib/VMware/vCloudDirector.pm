@@ -1,6 +1,6 @@
 package VMware::vCloudDirector;
 
-# ABSTRACT: Module to do stuff!
+# ABSTRACT: Interface to VMWare vCloud Directory REST API
 
 use strict;
 use warnings;
@@ -57,13 +57,26 @@ method _build_api () {
 }
 
 # ------------------------------------------------------------------------
-has org_list => (
+has org_listref => (
     is      => 'ro',
     isa     => 'ArrayRef[VMware::vCloudDirector::Object]',
     lazy    => 1,
-    builder => '_build_org_list'
+    builder => '_build_org_listref',
+    traits  => ['Array'],
+    handles => {
+        org_list => 'elements',
+        org_map  => 'map',
+        org_grep => 'grep',
+    },
 );
-method _build_org_list { return [ $self->api->GET('/api/org/') ]; }
+method _build_org_listref { return [ $self->api->GET('/api/org/') ]; }
+
+# ------------------------------------------------------------------------
+method query (@args) {
+    my $uri = $self->api->query_uri->clone;
+    $uri->query_form(@args);
+    return $self->api->GET($uri);
+}
 
 # ------------------------------------------------------------------------
 
