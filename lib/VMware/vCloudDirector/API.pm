@@ -379,6 +379,22 @@ method DELETE ($url) {
 }
 
 # ------------------------------------------------------------------------
+has query_uri => (
+    is      => 'ro',
+    isa     => Uri,
+    lazy    => 1,
+    builder => '_build_query_uri',
+    clearer => '_clear_query_uri',
+);
+
+method _build_query_uri () {
+    my @links = $self->current_session->find_links( rel => 'down', type => 'queryList' );
+    VMware::vCloudDirector::Error->throw('Cannot find single query URL')
+        unless ( scalar(@links) == 1 );
+    return $links[0]->href;
+}
+
+# ------------------------------------------------------------------------
 
 =head2 _clear_api_data
 
@@ -399,6 +415,7 @@ method _clear_api_data () {
     $self->_clear_raw_version_full;
     $self->_clear_authorization_token;
     $self->_clear_current_session;
+    $self->_clear_query_uri;
 }
 
 # ------------------------------------------------------------------------
