@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  Test::Exception: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -26,31 +27,53 @@ no_index:
 provides:
   VMware::vCloudDirector:
     file: lib/VMware/vCloudDirector.pm
-    version: '0.002'
+    version: '0.003'
   VMware::vCloudDirector::API:
     file: lib/VMware/vCloudDirector/API.pm
-    version: '0.002'
+    version: '0.003'
   VMware::vCloudDirector::Error:
     file: lib/VMware/vCloudDirector/Error.pm
-    version: '0.002'
+    version: '0.003'
   VMware::vCloudDirector::Link:
     file: lib/VMware/vCloudDirector/Link.pm
-    version: '0.002'
+    version: '0.003'
   VMware::vCloudDirector::Object:
     file: lib/VMware/vCloudDirector/Object.pm
-    version: '0.002'
+    version: '0.003'
   VMware::vCloudDirector::ObjectContent:
     file: lib/VMware/vCloudDirector/ObjectContent.pm
-    version: '0.002'
+    version: '0.003'
   VMware::vCloudDirector::UA:
     file: lib/VMware/vCloudDirector/UA.pm
-    version: '0.002'
+    version: '0.003'
+requires:
+  Const::Fast: '0'
+  LWP::UserAgent: '0'
+  Lingua::EN::Inflexion: '0'
+  MIME::Base64: '0'
+  Method::Signatures: '0'
+  Moose: '0'
+  MooseX::Types::Path::Tiny: '0'
+  MooseX::Types::URI: '0'
+  Mozilla::CA: '0'
+  Path::Tiny: '0'
+  Ref::Util: '0'
+  Scalar::Util: '0'
+  Syntax::Keyword::Try: '0'
+  Throwable::Error: '0'
+  XML::Fast: '0'
+  strict: '0'
+  warnings: '0'
 resources: {}
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: AutoPrereqs
+      version: '6.007'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -105,7 +128,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.002'
+          tag: '0.003'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:

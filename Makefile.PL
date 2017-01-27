@@ -15,13 +15,32 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "VMware-vCloudDirector",
   "LICENSE" => "perl",
   "NAME" => "VMware::vCloudDirector",
-  "PREREQ_PM" => {},
+  "PREREQ_PM" => {
+    "Const::Fast" => 0,
+    "LWP::UserAgent" => 0,
+    "Lingua::EN::Inflexion" => 0,
+    "MIME::Base64" => 0,
+    "Method::Signatures" => 0,
+    "Moose" => 0,
+    "MooseX::Types::Path::Tiny" => 0,
+    "MooseX::Types::URI" => 0,
+    "Mozilla::CA" => 0,
+    "Path::Tiny" => 0,
+    "Ref::Util" => 0,
+    "Scalar::Util" => 0,
+    "Syntax::Keyword::Try" => 0,
+    "Throwable::Error" => 0,
+    "XML::Fast" => 0,
+    "strict" => 0,
+    "warnings" => 0
+  },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
+    "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -29,9 +48,27 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Const::Fast" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
-  "Test::More" => 0
+  "LWP::UserAgent" => 0,
+  "Lingua::EN::Inflexion" => 0,
+  "MIME::Base64" => 0,
+  "Method::Signatures" => 0,
+  "Moose" => 0,
+  "MooseX::Types::Path::Tiny" => 0,
+  "MooseX::Types::URI" => 0,
+  "Mozilla::CA" => 0,
+  "Path::Tiny" => 0,
+  "Ref::Util" => 0,
+  "Scalar::Util" => 0,
+  "Syntax::Keyword::Try" => 0,
+  "Test::Exception" => 0,
+  "Test::More" => 0,
+  "Throwable::Error" => 0,
+  "XML::Fast" => 0,
+  "strict" => 0,
+  "warnings" => 0
 );
 
 
