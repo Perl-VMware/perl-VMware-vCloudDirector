@@ -3,7 +3,6 @@ use Test::More;
 use Test::Exception;
 
 use VMware::vCloudDirector;
-use Data::Printer;
 
 # Check for connection info to run additonal tests
 our %ENV;
