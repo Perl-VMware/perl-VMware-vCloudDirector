@@ -129,6 +129,26 @@ method fetch_links (@search_items) {
 }
 
 # ------------------------------------------------------------------------
+method _create_object ($hash, $type='Thing') {
+
+    # if thing has Link content within it then it is a full object, otherwise it
+    # is just a stub
+    my $object = VMware::vCloudDirector::Object->new(
+        hash => { $type => $hash },
+        api  => $self->api,
+        _partial_object => ( exists( $hash->{Link} ) ) ? 0 : 1,
+    );
+    $self->api->_debug(
+        sprintf(
+            'Object: [%s] instantiated %s for [%s]',
+            $self->type, ( $object->_partial_object ? 'a stub' : 'an object' ),
+            $object->type
+        )
+    ) if ( $self->api->debug );
+    return $object;
+}
+
+# ------------------------------------------------------------------------
 
 =head3 build_sub_objects
 
@@ -147,14 +167,19 @@ method build_sub_objects ($type) {
     my $container_type = noun($type)->plural;
     return unless exists( $self->hash->{$container_type} );
     foreach my $thing ( $self->_listify( $self->hash->{$container_type}{$type} ) ) {
-        my $object = VMware::vCloudDirector::Object->new(
-            hash            => { $type => $thing },
-            api             => $self->api,
-            _partial_object => 1
-        );
-        $self->api->_debug( 'Object: instantiated a stub for ' . $object->type )
-            if ( $self->api->debug );
-        push( @objects, $object );
+        push( @objects, $self->_create_object( $thing, $type ) );
+    }
+    return @objects;
+}
+
+method build_children_objects () {
+    my $hash = $self->hash;
+    return unless ( exists( $hash->{Children} ) );
+    my @objects;
+    foreach my $key ( keys %{ $hash->{Children} } ) {
+        foreach my $thing ( $self->_listify( $self->hash->{Children}{$key} ) ) {
+            push( @objects, $self->_create_object( $thing, $key ) );
+        }
     }
     return @objects;
 }
