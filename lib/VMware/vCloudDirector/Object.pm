@@ -58,6 +58,13 @@ method refetch () {
     my $hash = $self->api->GET_hash( $self->href );
     $self->_set_content(
         VMware::vCloudDirector::ObjectContent->new( object => $self, hash => $hash ) );
+    $self->api->_debug(
+        sprintf(
+            'Object: %s a [%s]',
+            ( $self->_partial_object ? 'Inflated' : 'Refetched' ),
+            $self->type
+        )
+    ) if ( $self->api->debug );
     $self->_partial_object(0);
     return $self;
 }
