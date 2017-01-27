@@ -1,5 +1,5 @@
 {
-   "abstract" : "Module to do stuff!",
+   "abstract" : "Interface to VMWare vCloud Directory REST API",
    "author" : [
       "Nigel Metheringham <nigelm@cpan.org>"
    ],
@@ -57,38 +57,38 @@
    "provides" : {
       "VMware::vCloudDirector" : {
          "file" : "lib/VMware/vCloudDirector.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "VMware::vCloudDirector::API" : {
          "file" : "lib/VMware/vCloudDirector/API.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "VMware::vCloudDirector::Error" : {
          "file" : "lib/VMware/vCloudDirector/Error.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "VMware::vCloudDirector::Link" : {
          "file" : "lib/VMware/vCloudDirector/Link.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "VMware::vCloudDirector::Object" : {
          "file" : "lib/VMware/vCloudDirector/Object.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "VMware::vCloudDirector::ObjectContent" : {
          "file" : "lib/VMware/vCloudDirector/ObjectContent.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "VMware::vCloudDirector::UA" : {
          "file" : "lib/VMware/vCloudDirector/UA.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "repository" : {}
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024000"
@@ -165,7 +165,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.001",
+                  "tag" : "0.002",
                   "tag_format" : "%v",
                   "tag_message" : "%v"
                },

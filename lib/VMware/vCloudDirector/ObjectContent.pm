@@ -5,14 +5,14 @@ package VMware::vCloudDirector::ObjectContent;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:NIGELM'; # AUTHORITY
 
 use Moose;
 use Method::Signatures;
 use MooseX::Types::URI qw(Uri);
+use Const::Fast;
 use Ref::Util qw(is_plain_hashref);
-use UUID::Tiny 1.02 qw(:std);
 use VMware::vCloudDirector::Link;
 
 # ------------------------------------------------------------------------
@@ -59,26 +59,22 @@ around BUILDARGS => sub {
         my $hash;
         if ( scalar( keys %{$top_hash} ) == 1 ) {
             my $type = ( keys %{$top_hash} )[0];
-            $hash           = $top_hash->{$type};
+            $hash = $top_hash->{$type};
             $params->{type} = $type;
-            $params->{hash} = $hash;
         }
         else {
             $hash = $top_hash;
         }
+        const $params->{hash} => $hash;    # force hash read-only to stop people playing
 
-        $params->{href}      = $hash->{-href} if ( exists( $hash->{-href} ) );
-        $params->{rel}       = $hash->{-rel}  if ( exists( $hash->{-rel} ) );
-        $params->{name}      = $hash->{-name} if ( exists( $hash->{-name} ) );
-        $params->{mime_type} = $hash->{-type} if ( exists( $hash->{-type} ) );
-        if ( exists( $hash->{-id} ) ) {
-            $params->{id} = $hash->{-id};
-        }
-        else {
-            if ( defined( $params->{href} ) ) {
-                my $id = substr( $params->{href}, -36 );
-                $params->{id} = $id if ( is_uuid_string($id) );
-            }
+        $params->{href} = $hash->{-href} if ( exists( $hash->{-href} ) );
+        $params->{rel}  = $hash->{-rel}  if ( exists( $hash->{-rel} ) );
+        $params->{name} = $hash->{-name} if ( exists( $hash->{-name} ) );
+        $params->{id}   = $hash->{-id}   if ( exists( $hash->{-id} ) );
+        if ( exists( $hash->{-type} ) ) {
+            my $type = $hash->{-type};
+            $params->{mime_type} = $type;
+            $params->{type} = $1 if ( $type =~ m|^application/vnd\..*\.(\w+)\+xml$| );
         }
     }
     return $class->$orig($params);
@@ -105,7 +101,7 @@ VMware::vCloudDirector::ObjectContent - A vCloud Object content
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 AUTHOR
 

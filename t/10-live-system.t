@@ -3,6 +3,7 @@ use Test::More;
 use Test::Exception;
 
 use VMware::vCloudDirector;
+use Data::Printer;
 
 # Check for connection info to run additonal tests
 our %ENV;
@@ -38,22 +39,24 @@ subtest 'Connection test with correct parameters' => sub {
     my $session;
     lives_ok( sub { $session = $vcd->api->login }, 'Login did not die' );
     isa_ok( $session, 'VMware::vCloudDirector::Object', 'Got an object back from login' );
-    is( $session->type, 'Session', 'The object is a Session' );
-    my $org_list = $vcd->org_list;
-    is( ref($org_list), 'ARRAY', 'Org list is an array reference' );
-    isa_ok( $org_list->[0], 'VMware::vCloudDirector::Object', 'Org list object is the right type' );
-    is( $org_list->[0]->type, 'Org', 'Org list object is an Org object' );
-    ok( ( scalar( @{$org_list} ) > 1 ), 'Org list has multiple entries (needed for System)' );
-    my ($sysorg) = grep { $_->name eq 'System' } @{$org_list};
+    is( $session->type, 'session', 'The object is a session' );
+    my @org_list = $vcd->org_list;
+    isa_ok( $org_list[0], 'VMware::vCloudDirector::Object', 'Org list object is the right type' );
+    is( $org_list[0]->type, 'org', 'Org list object is an Org object' );
+    ok( ( scalar(@org_list) > 1 ), 'Org list has multiple entries (needed for System)' );
+    my ($sysorg) = $vcd->org_grep( sub { $_->name eq 'System' } );
     ok( defined($sysorg), 'System org has been found' );
     isa_ok( $sysorg, 'VMware::vCloudDirector::Object', 'System org object is the right type' );
-    is( $sysorg->type, 'Org', 'System org object is an Org object' );
-    my @catlinks = $sysorg->find_links( rel => 'down', type => 'catalog' );
-    ok( scalar(@catlinks), 'At least one catalog link has been found' );
-    my $catlink = $catlinks[0];
-    isa_ok( $catlink, 'VMware::vCloudDirector::Link', 'Link object is the right type' );
-    my $catalog = [ $catlink->GET() ];
-    ok( scalar( @{$catlink} ), 'At least one catalog item has been retrieved' );
+    is( $sysorg->type, 'org', 'System org object is an Org object' );
+
+    #my @catlinks = $sysorg->find_links( rel => 'down', type => 'catalog' );
+    #ok( scalar(@catlinks), 'At least one catalog link has been found' );
+    #my $catlink = $catlinks[0];
+    #isa_ok( $catlink, 'VMware::vCloudDirector::Link', 'Link object is the right type' );
+    #my $catalog = [ $catlink->GET() ];
+    #$sysorg->inflate;
+    #p($sysorg);
+    #p( $sysorg->content );
     done_testing();
 };
 

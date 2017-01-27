@@ -5,13 +5,14 @@ package VMware::vCloudDirector::API;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:NIGELM'; # AUTHORITY
 
 use Moose;
 use Method::Signatures;
 use MIME::Base64;
-use MooseX::Types::Path::Tiny qw/Path/;
+use MooseX::Types::Path::Tiny qw(Path);
+use MooseX::Types::URI qw(Uri);
 use Mozilla::CA;
 use Path::Tiny;
 use Ref::Util qw(is_plain_hashref);
@@ -41,7 +42,7 @@ has default_accept_header => (
 
 has _base_url => (
     is      => 'ro',
-    isa     => 'URI',
+    isa     => Uri,
     lazy    => 1,
     builder => '_build_base_url',
     writer  => '_set_base_url',
@@ -181,7 +182,7 @@ has api_version => (
 );
 has _url_login => (
     is      => 'rw',
-    isa     => 'URI',
+    isa     => Uri,
     lazy    => 1,
     clearer => '_clear_url_login',
     builder => '_build_url_login'
@@ -209,7 +210,7 @@ method _build_raw_version () {
     my $version = 0;
     my $version_block;
     for my $verblock ( @{ $hash->{SupportedVersions}{VersionInfo} } ) {
-        next unless ( $verblock->{-deprecated} eq 'false' );
+        next if ( ( $verblock->{-deprecated} || '' ) eq 'true' );
         if ( $verblock->{Version} > $version ) {
             $version_block = $verblock;
             $version       = $verblock->{Version};
@@ -358,6 +359,22 @@ method DELETE ($url) {
 }
 
 # ------------------------------------------------------------------------
+has query_uri => (
+    is      => 'ro',
+    isa     => Uri,
+    lazy    => 1,
+    builder => '_build_query_uri',
+    clearer => '_clear_query_uri',
+);
+
+method _build_query_uri () {
+    my @links = $self->current_session->find_links( rel => 'down', type => 'queryList' );
+    VMware::vCloudDirector::Error->throw('Cannot find single query URL')
+        unless ( scalar(@links) == 1 );
+    return $links[0]->href;
+}
+
+# ------------------------------------------------------------------------
 
 
 method _clear_api_data () {
@@ -370,6 +387,7 @@ method _clear_api_data () {
     $self->_clear_raw_version_full;
     $self->_clear_authorization_token;
     $self->_clear_current_session;
+    $self->_clear_query_uri;
 }
 
 # ------------------------------------------------------------------------
@@ -393,7 +411,7 @@ VMware::vCloudDirector::API - Module to do stuff!
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head2 debug
 

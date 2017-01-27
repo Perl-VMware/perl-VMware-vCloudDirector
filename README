@@ -1,10 +1,10 @@
 NAME
 
-    VMware::vCloudDirector - Module to do stuff!
+    VMware::vCloudDirector - Interface to VMWare vCloud Directory REST API
 
 VERSION
 
-    version 0.001
+    version 0.002
 
 AUTHOR
 

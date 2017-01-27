@@ -1,5 +1,16 @@
 Revision history for VMware-vCloudDirector
 
+0.002     2017-01-27 15:21:36+00:00 Europe/London
+    - Changed handling of version deprecation
+    - More object utility methods, eg
+        - build_sub_objects
+        - build_children_objects
+        - fetch_links
+    - Better handling of 
+    - URIs are generally coerced and handled better
+    - query_uri accessor to API, query method in main module
+
+
 0.001     2017-01-25 15:42:10+00:00 Europe/London
     - Initial partial functionality release
       This is purely to allow me to test against consumer modules.
