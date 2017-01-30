@@ -10,9 +10,10 @@ use warnings;
 
 use Moose;
 use Method::Signatures;
-use MIME::Base64;
 use MooseX::Types::Path::Tiny qw(Path);
 use MooseX::Types::URI qw(Uri);
+use LWP::UserAgent;
+use MIME::Base64;
 use Mozilla::CA;
 use Path::Tiny;
 use Ref::Util qw(is_plain_hashref);
@@ -20,7 +21,6 @@ use Scalar::Util qw(looks_like_number);
 use Syntax::Keyword::Try;
 use VMware::vCloudDirector::Error;
 use VMware::vCloudDirector::Object;
-use VMware::vCloudDirector::UA;
 use XML::Fast qw();
 
 # ------------------------------------------------------------------------
@@ -85,17 +85,24 @@ method BUILD ($args) {
 # ------------------------------------------------------------------------
 has _ua => (
     is      => 'ro',
-    isa     => 'VMware::vCloudDirector::UA',
+    isa     => 'LWP::UserAgent',
     lazy    => 1,
     clearer => '_clear_ua',
     builder => '_build_ua'
 );
 
+has _ua_module_version => (
+    is      => 'ro',
+    isa     => 'Str',
+    default => sub { our $VERSION //= '0.00'; sprintf( '%s/%s', __PACKAGE__, $VERSION ) }
+);
+
 method _build_ua () {
-    return VMware::vCloudDirector::UA->new(
-        ssl_verify  => $self->ssl_verify,
-        ssl_ca_file => $self->ssl_ca_file,
-        timeout     => $self->timeout,
+    return LWP::UserAgent->new(
+        agent      => $self->_ua_module_version . ' ',
+        cookie_jar => {},
+        ssl_opts   => { verify_hostname => $self->ssl_verify, SSL_ca_file => $self->ssl_ca_file },
+        timeout    => $self->timeout
     );
 }
 
