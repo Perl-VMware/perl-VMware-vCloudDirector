@@ -11,7 +11,6 @@ use warnings;
 use Moose;
 use Method::Signatures;
 use MooseX::Types::Path::Tiny qw/Path/;
-use Mozilla::CA;
 use Path::Tiny;
 use VMware::vCloudDirector::API;
 use VMware::vCloudDirector::Error;
@@ -19,22 +18,16 @@ use VMware::vCloudDirector::Object;
 
 # ------------------------------------------------------------------------
 
-has hostname   => ( is => 'ro', isa => 'Str',  required => 1 );
-has username   => ( is => 'ro', isa => 'Str',  required => 1 );
-has password   => ( is => 'ro', isa => 'Str',  required => 1 );
-has orgname    => ( is => 'ro', isa => 'Str',  required => 1, default => 'System' );
-has ssl_verify => ( is => 'ro', isa => 'Bool', default  => 1 );
-has debug   => ( is => 'rw', isa => 'Bool', default => 0 );      # Defaults to no debug info
-has timeout => ( is => 'rw', isa => 'Int',  default => 120 );    # Defaults to 120 seconds
+has debug => ( is => 'rw', isa => 'Bool', default => 0 );    # Defaults to no debug info
 
-has ssl_ca_file => (
-    is      => 'ro',
-    isa     => Path,
-    coerce  => 1,
-    lazy    => 1,
-    builder => '_build_ssl_ca_file'
-);
-method _build_ssl_ca_file () { return path( Mozilla::CA::SSL_ca_file() ); }
+has hostname   => ( is => 'ro', isa => 'Str',  required  => 1 );
+has username   => ( is => 'ro', isa => 'Str',  required  => 1 );
+has password   => ( is => 'ro', isa => 'Str',  required  => 1 );
+has orgname    => ( is => 'ro', isa => 'Str',  required  => 1, default => 'System' );
+has ssl_verify => ( is => 'ro', isa => 'Bool', predicate => '_has_ssl_verify' );
+has timeout    => ( is => 'rw', isa => 'Int',  predicate => '_has_timeout' );
+has ssl_ca_file => ( is => 'ro', isa => Path, coerce => 1, predicate => '_has_ssl_ca_file' );
+has _ua => ( is => 'ro', isa => 'LWP::UserAgent', predicate => '_has_ua' );
 
 has api => (
     is      => 'ro',
@@ -44,16 +37,19 @@ has api => (
 );
 
 method _build_api () {
-    return VMware::vCloudDirector::API->new(
-        hostname    => $self->hostname,
-        username    => $self->username,
-        password    => $self->password,
-        orgname     => $self->orgname,
-        ssl_verify  => $self->ssl_verify,
-        debug       => $self->debug,
-        timeout     => $self->timeout,
-        ssl_ca_file => $self->ssl_ca_file,
+    my @args = (
+        hostname => $self->hostname,
+        username => $self->username,
+        password => $self->password,
+        orgname  => $self->orgname,
+        debug    => $self->debug
     );
+    push( @args, timeout     => $self->timeout )     if ( $self->_has_timeout );
+    push( @args, ssl_verify  => $self->ssl_verify )  if ( $self->_has_ssl_verify );
+    push( @args, ssl_ca_file => $self->ssl_ca_file ) if ( $self->_has_ssl_ca_file );
+    push( @args, _ua         => $self->_ua )         if ( $self->_has_ua );
+
+    return VMware::vCloudDirector::API->new(@args);
 }
 
 # ------------------------------------------------------------------------
