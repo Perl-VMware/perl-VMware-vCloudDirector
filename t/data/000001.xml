@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<SupportedVersions xmlns="http://www.vmware.com/vcloud/versions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vmware.com/vcloud/versions http://vcloud.example.com/api/versions/schema/versions.xsd">
+<SupportedVersions xmlns="http://www.vmware.com/vcloud/versions" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vmware.com/vcloud/versions http://10.117.138.31/api/versions/schema/versions.xsd">
     <VersionInfo>
         <Version>5.5</Version>
         <LoginUrl>https://vcloud.example.com/api/sessions</LoginUrl>
