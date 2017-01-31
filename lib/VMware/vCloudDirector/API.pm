@@ -4,6 +4,7 @@ package VMware::vCloudDirector::API;
 
 use strict;
 use warnings;
+use v5.10;    # needed for state variable
 
 # VERSION
 # AUTHORITY
@@ -22,6 +23,7 @@ use Syntax::Keyword::Try;
 use VMware::vCloudDirector::Error;
 use VMware::vCloudDirector::Object;
 use XML::Fast qw();
+use Data::Dump qw(pp);
 
 # ------------------------------------------------------------------------
 has hostname   => ( is => 'ro', isa => 'Str',  required => 1 );
@@ -31,6 +33,8 @@ has orgname    => ( is => 'ro', isa => 'Str',  required => 1, default => 'System
 has ssl_verify => ( is => 'ro', isa => 'Bool', default  => 1 );
 has debug      => ( is => 'rw', isa => 'Int',  default  => 0, );
 has timeout => ( is => 'rw', isa => 'Int', default => 120 );    # Defaults to 120 seconds
+has _debug_trace_directory =>
+    ( is => 'ro', isa => Path, coerce => 1, predicate => '_has_debug_trace_directory' );
 
 has default_accept_header => (
     is      => 'ro',
@@ -169,6 +173,18 @@ method _request ($method, $url, $content?, $headers?) {
                 request => $request,
             }
         );
+    }
+
+    # if _debug_trace_directory is set - we dump info from each request out into
+    # a pair of files, one with the dumped response object, the other with the content
+    if ( $self->_has_debug_trace_directory ) {
+        state $xcount = 0;
+        die "No trace directory - " . $self->_debug_trace_directory
+            unless ( $self->_debug_trace_directory->is_dir );
+        $self->_debug_trace_directory->child( sprintf( '%06d.txt', ++$xcount ) )
+            ->spew( pp($response) );
+        $self->_debug_trace_directory->child( sprintf( '%06d.xml', $xcount ) )
+            ->spew( $response->decoded_content );
     }
 
     # Throw if this went wrong
