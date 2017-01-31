@@ -18,6 +18,52 @@ use VMware::vCloudDirector::Object;
 
 # ------------------------------------------------------------------------
 
+=head2 Attributes
+
+=head3 hostname
+
+Hostname of the vCloud server.  Must have a vCloud instance listening for https
+on port 443.
+
+=head3 username
+
+Username to use to login to vCloud server.
+
+=head3 password
+
+Password to use to login to vCloud server.
+
+=head3 orgname
+
+Org name to use to login to vCloud server - this defaults to C<System>.
+
+=head3 timeout
+
+Command timeout in seconds.  Defaults to 120.
+
+=head3 default_accept_header
+
+The default MIME types to accept.  This is automatically set based on the
+information received back from the API versions.
+
+=head3 ssl_verify
+
+Whether to do standard SSL certificate verification.  Defaults to set.
+
+=head3 ssl_ca_file
+
+The SSL CA set to trust packaged in a file.  This defaults to those set in the
+L<Mozilla::CA>
+
+=head2 debug
+
+Set debug level.  The higher the debug level, the more chatter is exposed.
+
+Defaults to 0 (no output) unless the environment variable C<VCLOUD_API_DEBUG>
+is set to something that is non-zero.  Picked up at create time in C<BUILD()>
+
+=cut
+
 has debug => ( is => 'rw', isa => 'Bool', default => 0 );    # Defaults to no debug info
 
 has hostname   => ( is => 'ro', isa => 'Str',  required  => 1 );

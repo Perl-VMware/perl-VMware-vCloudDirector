@@ -16,6 +16,33 @@ use VMware::vCloudDirector::ObjectContent;
 
 # ------------------------------------------------------------------------
 
+=head2 Attributes
+
+=head3 api
+
+A weak link to the API object to be used.
+
+=head3 content
+
+The object content.  This is in a separate container so that partial objects
+passed can be inflated at a later stage without having to replace the object
+itself.
+
+=head3 hash
+
+A reference to the hash returned from the vCloud XML.  Forces object inflation.
+
+=head3 links
+
+An array references to the links contained in this object.  Forces object
+inflation.
+
+=head3 id
+
+The id attribute from the returned vCloud XML.  Forces object inflation.
+
+=cut
+
 has api => (
     is            => 'ro',
     isa           => 'VMware::vCloudDirector::API',
@@ -48,6 +75,21 @@ method BUILD ($args) {
 }
 
 # ------------------------------------------------------------------------
+
+=head2 Methods
+
+=head3 inflate
+
+If this object is a partial object (ie taken from a link or partial chunk
+within a containing object), then this forces a refetch of the content from
+vCloud creating a fully populated object.
+
+=head3 refetch
+
+Forces a refetch of this object's content unconditionally.
+
+=cut
+
 method inflate () {
     $self->refetch if ( $self->_partial_object );
     return $self;
