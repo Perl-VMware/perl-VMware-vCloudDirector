@@ -43,8 +43,10 @@ has links => (
 
 method _build_links () {
     my @links;
-    push( @links, VMware::vCloudDirector::Link->new( hash => $_, object => $self->object ) )
-        foreach ( $self->_listify( $self->hash->{Link} ) );
+    if ( exists( $self->hash->{Link} ) ) {
+        push( @links, VMware::vCloudDirector::Link->new( hash => $_, object => $self->object ) )
+            foreach ( $self->_listify( $self->hash->{Link} ) );
+    }
     return \@links;
 }
 
