@@ -207,7 +207,9 @@ does magic with the language inflection module.
 method build_sub_objects ($type) {
     my @objects;
     my $container_type = noun($type)->plural;
-    return unless exists( $self->hash->{$container_type} );
+    return
+        unless ( exists( $self->hash->{$container_type} )
+        and is_plain_hashref( $self->hash->{$container_type} ) );
     foreach my $thing ( $self->_listify( $self->hash->{$container_type}{$type} ) ) {
         push( @objects, $self->_create_object( $thing, $type ) );
     }
@@ -216,7 +218,7 @@ method build_sub_objects ($type) {
 
 method build_children_objects () {
     my $hash = $self->hash;
-    return unless ( exists( $hash->{Children} ) );
+    return unless ( exists( $hash->{Children} ) and is_plain_hashref( $hash->{Children} ) );
     my @objects;
     foreach my $key ( keys %{ $hash->{Children} } ) {
         foreach my $thing ( $self->_listify( $self->hash->{Children}{$key} ) ) {
