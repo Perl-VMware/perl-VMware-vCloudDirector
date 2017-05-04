@@ -18,6 +18,34 @@ use VMware::vCloudDirector::Object;
 
 # ------------------------------------------------------------------------
 
+=head1 DESCRIPTION
+
+Thinish wrapper of the VMware vCloud Director REST API.
+
+THIS IS AT AN EARLY STAGE OF DEVELOPMENT - PROTOTYPING REALLY - AND MAY CHANGE
+DRAMATICALLY OR EAT YOUR DATA.
+
+The target application is to read information from a vCloud instance, so the
+ability to change or write data to the vCloud system has not been implemented
+as yet...
+
+=head1 SYNOPSIS
+
+    # THIS IS AT AN EARLY STAGE OF DEVELOPMENT - PROTOTYPING REALLY
+    # IT MAY CHANGE DRAMATICALLY OR EAT YOUR DATA.
+
+    use VMware::vCloudDirector
+
+    my $vcd = VMware::vCloudDirector->new(
+        hostname   => $host,
+        username   => $user,
+        password   => $pass,
+        orgname    => $org,
+        ssl_verify => 0,
+    );
+    my @org_list = $vcd->org_list;
+
+
 =head2 Attributes
 
 =head3 hostname

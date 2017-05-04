@@ -6,6 +6,22 @@ VMware::vCloudDirector - Interface to VMWare vCloud Directory REST API
 
 version 0.004
 
+# SYNOPSIS
+
+    # THIS IS AT AN EARLY STAGE OF DEVELOPMENT - PROTOTYPING REALLY
+    # IT MAY CHANGE DRAMATICALLY OR EAT YOUR DATA.
+
+    use VMware::vCloudDirector
+
+    my $vcd = VMware::vCloudDirector->new(
+        hostname   => $host,
+        username   => $user,
+        password   => $pass,
+        orgname    => $org,
+        ssl_verify => 0,
+    );
+    my @org_list = $vcd->org_list;
+
 ## Attributes
 
 ### hostname
@@ -49,6 +65,16 @@ Set debug level.  The higher the debug level, the more chatter is exposed.
 
 Defaults to 0 (no output) unless the environment variable `VCLOUD_API_DEBUG`
 is set to something that is non-zero.  Picked up at create time in `BUILD()`
+
+# DESCRIPTION
+
+Thinish wrapper of the VMware vCloud Director REST API.
+
+THIS IS AT AN EARLY STAGE OF DEVELOPMENT - PROTOTYPING REALLY - AND MAY CHANGE DRAMATICALLY OR EAT
+YOUR DATA.
+
+The target application is to read information from a vCloud instance, so the ability to change or
+write data to the vCloud system has not been implemented as yet...
 
 # AUTHOR
 

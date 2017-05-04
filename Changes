@@ -2,6 +2,7 @@ Revision history for VMware-vCloudDirector
 
 {{$NEXT}}
     - Better checking in object expansion (used to error)
+    - Bare minimum documentation before initial prototype release to CPAN
 
 0.003     2017-01-27 15:41:23+00:00 Europe/London
     - Fix dependancies in distro
