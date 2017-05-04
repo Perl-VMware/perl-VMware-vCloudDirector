@@ -5,7 +5,7 @@ package VMware::vCloudDirector::ObjectContent;
 use strict;
 use warnings;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 our $AUTHORITY = 'cpan:NIGELM'; # AUTHORITY
 
 use Moose;
@@ -43,8 +43,10 @@ has links => (
 
 method _build_links () {
     my @links;
-    push( @links, VMware::vCloudDirector::Link->new( hash => $_, object => $self->object ) )
-        foreach ( $self->_listify( $self->hash->{Link} ) );
+    if ( exists( $self->hash->{Link} ) ) {
+        push( @links, VMware::vCloudDirector::Link->new( hash => $_, object => $self->object ) )
+            foreach ( $self->_listify( $self->hash->{Link} ) );
+    }
     return \@links;
 }
 
@@ -101,7 +103,7 @@ VMware::vCloudDirector::ObjectContent - A vCloud Object content
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 AUTHOR
 

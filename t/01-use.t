@@ -8,7 +8,6 @@ foreach my $module (
     VMware::vCloudDirector::Error
     VMware::vCloudDirector::Link
     VMware::vCloudDirector::Object
-    VMware::vCloudDirector::UA
     VMware::vCloudDirector
     ]
     ) {

@@ -1,5 +1,9 @@
 Revision history for VMware-vCloudDirector
 
+0.004     2017-05-04 15:24:39+01:00 Europe/London
+    - Better checking in object expansion (used to error)
+    - Bare minimum documentation before initial prototype release to CPAN
+
 0.003     2017-01-27 15:41:23+00:00 Europe/London
     - Fix dependancies in distro
 
@@ -9,7 +13,6 @@ Revision history for VMware-vCloudDirector
         - build_sub_objects
         - build_children_objects
         - fetch_links
-    - Better handling of 
     - URIs are generally coerced and handled better
     - query_uri accessor to API, query method in main module
 

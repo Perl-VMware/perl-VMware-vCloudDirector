@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,9 +14,11 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "VMware-vCloudDirector",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "VMware::vCloudDirector",
   "PREREQ_PM" => {
     "Const::Fast" => 0,
+    "Data::Dump" => 0,
     "LWP::UserAgent" => 0,
     "Lingua::EN::Inflexion" => 0,
     "MIME::Base64" => 0,
@@ -37,10 +39,12 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
+    "FindBin" => 0,
     "Test::Exception" => 0,
+    "Test::LWP::UserAgent" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,8 +53,10 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Const::Fast" => 0,
+  "Data::Dump" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
+  "FindBin" => 0,
   "LWP::UserAgent" => 0,
   "Lingua::EN::Inflexion" => 0,
   "MIME::Base64" => 0,
@@ -64,6 +70,7 @@ my %FallbackPrereqs = (
   "Scalar::Util" => 0,
   "Syntax::Keyword::Try" => 0,
   "Test::Exception" => 0,
+  "Test::LWP::UserAgent" => 0,
   "Test::More" => 0,
   "Throwable::Error" => 0,
   "XML::Fast" => 0,

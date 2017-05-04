@@ -5,7 +5,7 @@ package VMware::vCloudDirector::Object;
 use strict;
 use warnings;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 our $AUTHORITY = 'cpan:NIGELM'; # AUTHORITY
 
 use Moose;
@@ -15,6 +15,7 @@ use Lingua::EN::Inflexion;
 use VMware::vCloudDirector::ObjectContent;
 
 # ------------------------------------------------------------------------
+
 
 has api => (
     is            => 'ro',
@@ -48,6 +49,8 @@ method BUILD ($args) {
 }
 
 # ------------------------------------------------------------------------
+
+
 method inflate () {
     $self->refetch if ( $self->_partial_object );
     return $self;
@@ -124,7 +127,9 @@ method _create_object ($hash, $type='Thing') {
 method build_sub_objects ($type) {
     my @objects;
     my $container_type = noun($type)->plural;
-    return unless exists( $self->hash->{$container_type} );
+    return
+        unless ( exists( $self->hash->{$container_type} )
+        and is_plain_hashref( $self->hash->{$container_type} ) );
     foreach my $thing ( $self->_listify( $self->hash->{$container_type}{$type} ) ) {
         push( @objects, $self->_create_object( $thing, $type ) );
     }
@@ -133,7 +138,7 @@ method build_sub_objects ($type) {
 
 method build_children_objects () {
     my $hash = $self->hash;
-    return unless ( exists( $hash->{Children} ) );
+    return unless ( exists( $hash->{Children} ) and is_plain_hashref( $hash->{Children} ) );
     my @objects;
     foreach my $key ( keys %{ $hash->{Children} } ) {
         foreach my $thing ( $self->_listify( $self->hash->{Children}{$key} ) ) {
@@ -178,7 +183,44 @@ VMware::vCloudDirector::Object - Module to contain an object!
 
 =head1 VERSION
 
-version 0.003
+version 0.004
+
+=head2 Attributes
+
+=head3 api
+
+A weak link to the API object to be used.
+
+=head3 content
+
+The object content.  This is in a separate container so that partial objects
+passed can be inflated at a later stage without having to replace the object
+itself.
+
+=head3 hash
+
+A reference to the hash returned from the vCloud XML.  Forces object inflation.
+
+=head3 links
+
+An array references to the links contained in this object.  Forces object
+inflation.
+
+=head3 id
+
+The id attribute from the returned vCloud XML.  Forces object inflation.
+
+=head2 Methods
+
+=head3 inflate
+
+If this object is a partial object (ie taken from a link or partial chunk
+within a containing object), then this forces a refetch of the content from
+vCloud creating a fully populated object.
+
+=head3 refetch
+
+Forces a refetch of this object's content unconditionally.
 
 =head3 find_links
 

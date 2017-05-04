@@ -5,7 +5,9 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  FindBin: '0'
   Test::Exception: '0'
+  Test::LWP::UserAgent: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -27,27 +29,25 @@ no_index:
 provides:
   VMware::vCloudDirector:
     file: lib/VMware/vCloudDirector.pm
-    version: '0.003'
+    version: '0.004'
   VMware::vCloudDirector::API:
     file: lib/VMware/vCloudDirector/API.pm
-    version: '0.003'
+    version: '0.004'
   VMware::vCloudDirector::Error:
     file: lib/VMware/vCloudDirector/Error.pm
-    version: '0.003'
+    version: '0.004'
   VMware::vCloudDirector::Link:
     file: lib/VMware/vCloudDirector/Link.pm
-    version: '0.003'
+    version: '0.004'
   VMware::vCloudDirector::Object:
     file: lib/VMware/vCloudDirector/Object.pm
-    version: '0.003'
+    version: '0.004'
   VMware::vCloudDirector::ObjectContent:
     file: lib/VMware/vCloudDirector/ObjectContent.pm
-    version: '0.003'
-  VMware::vCloudDirector::UA:
-    file: lib/VMware/vCloudDirector/UA.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Const::Fast: '0'
+  Data::Dump: '0'
   LWP::UserAgent: '0'
   Lingua::EN::Inflexion: '0'
   MIME::Base64: '0'
@@ -62,10 +62,13 @@ requires:
   Syntax::Keyword::Try: '0'
   Throwable::Error: '0'
   XML::Fast: '0'
+  perl: v5.10.0
   strict: '0'
   warnings: '0'
-resources: {}
-version: '0.003'
+resources:
+  homepage: https://github.com/Perl-VMware/perl-VMware-vCloudDirector
+  repository: https://github.com/Perl-VMware/perl-VMware-vCloudDirector.git
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
@@ -128,7 +131,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.003'
+          tag: '0.004'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:
@@ -189,7 +192,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          'git --version': 2.10.0
+          'git --version': 2.12.2
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -240,9 +243,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Test::EOL:
           filename: xt/author/eol.t
           finder:
-            - ':ExecFiles'
             - ':InstallModules'
-            - ':TestFiles'
           trailing_whitespace: 1
       name: Test::EOL
       version: '0.19'
@@ -447,6 +448,10 @@ x_Dist_Zilla:
       name: '@Starter/ConfirmRelease'
       version: '6.007'
     -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Starter/UploadToCPAN'
+      version: '6.007'
+    -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
         Dist::Zilla::Role::FileWatcher:
@@ -461,10 +466,6 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::GitHubREADME::Badge
       name: GitHubREADME::Badge
       version: '0.20'
-    -
-      class: Dist::Zilla::Plugin::FakeRelease
-      name: FakeRelease
-      version: '6.007'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

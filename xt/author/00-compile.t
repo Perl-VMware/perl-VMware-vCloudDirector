@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 8;
+plan tests => 7;
 
 my @module_files = (
     'VMware/vCloudDirector.pm',
@@ -14,8 +14,7 @@ my @module_files = (
     'VMware/vCloudDirector/Error.pm',
     'VMware/vCloudDirector/Link.pm',
     'VMware/vCloudDirector/Object.pm',
-    'VMware/vCloudDirector/ObjectContent.pm',
-    'VMware/vCloudDirector/UA.pm'
+    'VMware/vCloudDirector/ObjectContent.pm'
 );
 
 

@@ -4,15 +4,17 @@ package VMware::vCloudDirector::API;
 
 use strict;
 use warnings;
+use v5.10;    # needed for state variable
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 our $AUTHORITY = 'cpan:NIGELM'; # AUTHORITY
 
 use Moose;
 use Method::Signatures;
-use MIME::Base64;
 use MooseX::Types::Path::Tiny qw(Path);
 use MooseX::Types::URI qw(Uri);
+use LWP::UserAgent;
+use MIME::Base64;
 use Mozilla::CA;
 use Path::Tiny;
 use Ref::Util qw(is_plain_hashref);
@@ -20,10 +22,12 @@ use Scalar::Util qw(looks_like_number);
 use Syntax::Keyword::Try;
 use VMware::vCloudDirector::Error;
 use VMware::vCloudDirector::Object;
-use VMware::vCloudDirector::UA;
 use XML::Fast qw();
+use Data::Dump qw(pp);
 
 # ------------------------------------------------------------------------
+
+
 has hostname   => ( is => 'ro', isa => 'Str',  required => 1 );
 has username   => ( is => 'ro', isa => 'Str',  required => 1 );
 has password   => ( is => 'ro', isa => 'Str',  required => 1 );
@@ -31,6 +35,8 @@ has orgname    => ( is => 'ro', isa => 'Str',  required => 1, default => 'System
 has ssl_verify => ( is => 'ro', isa => 'Bool', default  => 1 );
 has debug      => ( is => 'rw', isa => 'Int',  default  => 0, );
 has timeout => ( is => 'rw', isa => 'Int', default => 120 );    # Defaults to 120 seconds
+has _debug_trace_directory =>
+    ( is => 'ro', isa => Path, coerce => 1, predicate => '_has_debug_trace_directory' );
 
 has default_accept_header => (
     is      => 'ro',
@@ -64,7 +70,6 @@ method _debug (@parameters) { warn join( '', '# ', @parameters, "\n" ) if ( $sel
 
 # ------------------------------------------------------------------------
 
-
 method BUILD ($args) {
 
     # deal with setting debug if needed
@@ -77,17 +82,24 @@ method BUILD ($args) {
 # ------------------------------------------------------------------------
 has _ua => (
     is      => 'ro',
-    isa     => 'VMware::vCloudDirector::UA',
+    isa     => 'LWP::UserAgent',
     lazy    => 1,
     clearer => '_clear_ua',
     builder => '_build_ua'
 );
 
+has _ua_module_version => (
+    is      => 'ro',
+    isa     => 'Str',
+    default => sub { our $VERSION //= '0.00'; sprintf( '%s/%s', __PACKAGE__, $VERSION ) }
+);
+
 method _build_ua () {
-    return VMware::vCloudDirector::UA->new(
-        ssl_verify  => $self->ssl_verify,
-        ssl_ca_file => $self->ssl_ca_file,
-        timeout     => $self->timeout,
+    return LWP::UserAgent->new(
+        agent      => $self->_ua_module_version . ' ',
+        cookie_jar => {},
+        ssl_opts   => { verify_hostname => $self->ssl_verify, SSL_ca_file => $self->ssl_ca_file },
+        timeout    => $self->timeout
     );
 }
 
@@ -154,6 +166,18 @@ method _request ($method, $url, $content?, $headers?) {
                 request => $request,
             }
         );
+    }
+
+    # if _debug_trace_directory is set - we dump info from each request out into
+    # a pair of files, one with the dumped response object, the other with the content
+    if ( $self->_has_debug_trace_directory ) {
+        state $xcount = 0;
+        die "No trace directory - " . $self->_debug_trace_directory
+            unless ( $self->_debug_trace_directory->is_dir );
+        $self->_debug_trace_directory->child( sprintf( '%06d.txt', ++$xcount ) )
+            ->spew( pp($response) );
+        $self->_debug_trace_directory->child( sprintf( '%06d.xml', $xcount ) )
+            ->spew( $response->decoded_content );
     }
 
     # Throw if this went wrong
@@ -229,6 +253,8 @@ method _build_raw_version_full () {
 }
 
 # ------------------------ ------------------------------------------------
+
+
 has authorization_token => (
     is        => 'ro',
     isa       => 'Str',
@@ -326,6 +352,8 @@ method _build_returned_objects ($response) {
 }
 
 # ------------------------------------------------------------------------
+
+
 method GET ($url) {
     $self->current_session;    # ensure/force valid session in place
     my $response = $self->_request( 'GET', $url );
@@ -359,6 +387,8 @@ method DELETE ($url) {
 }
 
 # ------------------------------------------------------------------------
+
+
 has query_uri => (
     is      => 'ro',
     isa     => Uri,
@@ -411,25 +441,109 @@ VMware::vCloudDirector::API - Module to do stuff!
 
 =head1 VERSION
 
-version 0.003
+version 0.004
+
+=head2 Attributes
+
+=head3 hostname
+
+Hostname of the vCloud server.  Must have a vCloud instance listening for https
+on port 443.
+
+=head3 username
+
+Username to use to login to vCloud server.
+
+=head3 password
+
+Password to use to login to vCloud server.
+
+=head3 orgname
+
+Org name to use to login to vCloud server - this defaults to C<System>.
+
+=head3 timeout
+
+Command timeout in seconds.  Defaults to 120.
+
+=head3 default_accept_header
+
+The default MIME types to accept.  This is automatically set based on the
+information received back from the API versions.
+
+=head3 ssl_verify
+
+Whether to do standard SSL certificate verification.  Defaults to set.
+
+=head3 ssl_ca_file
+
+The SSL CA set to trust packaged in a file.  This defaults to those set in the
+L<Mozilla::CA>
 
 =head2 debug
 
 Set debug level.  The higher the debug level, the more chatter is exposed.
 
 Defaults to 0 (no output) unless the environment variable C<VCLOUD_API_DEBUG>
-is set to something that is non-zero.  Picked up at create time in C<BUILD()>
+is set to something that is non-zero.  Picked up at create time in C<BUILD()>.
 
-=head1 API SHORTHAND METHODS
+=head2 API SHORTHAND METHODS
 
-=head2 api_version
-
-* Relative URL: /api/versions
+=head3 api_version
 
 The C<api_version> holds the version number of the highest discovered non-
 deprecated API, it is initialised by connecting to the C</api/versions>
 endpoint, and is called implicitly during the login setup.  Once filled the
 values are cached.
+
+=head3 authorization_token
+
+The C<authorization_token> holds the vCloud authentication token that has been
+handed out.  It is set by L<login>, and can be tested for by using the
+predicate C<has_authorization_token>.
+
+=head3 current_session
+
+The current session object for this login.  Attempting to access this forces a
+login and creation of a current session.
+
+=head3 login
+
+Returns the L<current_session> which co-incidently forces a login.
+
+=head3 logout
+
+If there is a current session, DELETEs it, and clears the current session state
+data.
+
+=head3 GET ($url)
+
+Forces a session establishment, and does a GET operation on the given URL,
+returning the objects that were built.
+
+=head3 GET_hash ($url)
+
+Forces a session establishment, and does a GET operation on the given URL,
+returning the XML equivalent hash that was built.
+
+=head3 PUT ($url, $xml_hash)
+
+Forces a session establishment, and does a PUT operation on the given URL,
+passing the XML string or encoded hash, returning the objects that were built.
+
+=head3 POST ($url, $xml_hash)
+
+Forces a session establishment, and does a POST operation on the given URL,
+passing the XML string or encoded hash, returning the objects that were built.
+
+=head3 DELETE ($url)
+
+Forces a session establishment, and does a DELETE operation on the given URL,
+returning the objects that were built.
+
+=head3 query_uri
+
+Returns the URI for query operations, as taken from the initial session object.
 
 =head2 _clear_api_data
 
