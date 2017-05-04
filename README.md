@@ -1,3 +1,10 @@
+[![Build Status](https://travis-ci.org/Perl-VMware/perl-VMware-vCloudDirector.svg?branch=master)](https://travis-ci.org/Perl-VMware/perl-VMware-vCloudDirector)
+[![Kwalitee status](http://cpants.cpanauthors.org/dist/VMware-vCloudDirector.png)](http://cpants.charsbar.org/dist/overview/VMware-vCloudDirector)
+[![GitHub issues](https://img.shields.io/github/issues/Perl-VMware/perl-VMware-vCloudDirector.svg)](https://github.com/Perl-VMware/perl-VMware-vCloudDirector/issues)
+[![GitHub tag](https://img.shields.io/github/tag/Perl-VMware/perl-VMware-vCloudDirector.svg)]()
+[![Cpan license](https://img.shields.io/cpan/l/VMware-vCloudDirector.svg)](https://metacpan.org/release/VMware-vCloudDirector)
+[![Cpan version](https://img.shields.io/cpan/v/VMware-vCloudDirector.svg)](https://metacpan.org/release/VMware-vCloudDirector)
+
 # NAME
 
 VMware::vCloudDirector - Interface to VMWare vCloud Directory REST API
@@ -70,11 +77,12 @@ is set to something that is non-zero.  Picked up at create time in `BUILD()`
 
 Thinish wrapper of the VMware vCloud Director REST API.
 
-THIS IS AT AN EARLY STAGE OF DEVELOPMENT - PROTOTYPING REALLY - AND MAY CHANGE DRAMATICALLY OR EAT
-YOUR DATA.
+THIS IS AT AN EARLY STAGE OF DEVELOPMENT - PROTOTYPING REALLY - AND MAY CHANGE
+DRAMATICALLY OR EAT YOUR DATA.
 
-The target application is to read information from a vCloud instance, so the ability to change or
-write data to the vCloud system has not been implemented as yet...
+The target application is to read information from a vCloud instance, so the
+ability to change or write data to the vCloud system has not been implemented
+as yet...
 
 # AUTHOR
 
