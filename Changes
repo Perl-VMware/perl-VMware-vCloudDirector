@@ -1,5 +1,8 @@
 Revision history for VMware-vCloudDirector
 
+0.005     2017-06-27 13:58:12+01:00 Europe/London
+    - More informative exception messages
+
 0.004     2017-05-04 15:24:39+01:00 Europe/London
     - Better checking in object expansion (used to error)
     - Bare minimum documentation before initial prototype release to CPAN

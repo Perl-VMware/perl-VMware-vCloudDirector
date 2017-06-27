@@ -85,27 +85,27 @@
    "provides" : {
       "VMware::vCloudDirector" : {
          "file" : "lib/VMware/vCloudDirector.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "VMware::vCloudDirector::API" : {
          "file" : "lib/VMware/vCloudDirector/API.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "VMware::vCloudDirector::Error" : {
          "file" : "lib/VMware/vCloudDirector/Error.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "VMware::vCloudDirector::Link" : {
          "file" : "lib/VMware/vCloudDirector/Link.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "VMware::vCloudDirector::Object" : {
          "file" : "lib/VMware/vCloudDirector/Object.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       },
       "VMware::vCloudDirector::ObjectContent" : {
          "file" : "lib/VMware/vCloudDirector/ObjectContent.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -117,7 +117,7 @@
          "web" : "https://github.com/Perl-VMware/perl-VMware-vCloudDirector"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024000"
@@ -199,7 +199,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.004",
+                  "tag" : "0.005",
                   "tag_format" : "%v",
                   "tag_message" : "%v"
                },
@@ -282,7 +282,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git --version" : "2.12.2",
+                  "git --version" : "2.13.0",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",

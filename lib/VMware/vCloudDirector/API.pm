@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use v5.10;    # needed for state variable
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 our $AUTHORITY = 'cpan:NIGELM'; # AUTHORITY
 
 use Moose;
@@ -182,8 +182,11 @@ method _request ($method, $url, $content?, $headers?) {
 
     # Throw if this went wrong
     if ( $response->is_error ) {
+        my $message = "$method request failed";
+        try { $message .= ' - ' . $response->decoded_content->{Error}{'-message'}; }
+        catch { $message .= ' - Unknown'; }
         VMware::vCloudDirector::Error->throw(
-            {   message  => "$method request failed",
+            {   message  => $message,
                 uri      => $uri,
                 request  => $request,
                 response => $response
@@ -441,7 +444,7 @@ VMware::vCloudDirector::API - Module to do stuff!
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head2 Attributes
 
