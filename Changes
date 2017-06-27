@@ -1,6 +1,7 @@
 Revision history for VMware-vCloudDirector
 
 {{$NEXT}}
+    - More informative exception messages
 
 0.004     2017-05-04 15:24:39+01:00 Europe/London
     - Better checking in object expansion (used to error)

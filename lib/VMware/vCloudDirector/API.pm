@@ -227,8 +227,11 @@ method _request ($method, $url, $content?, $headers?) {
 
     # Throw if this went wrong
     if ( $response->is_error ) {
+        my $message = "$method request failed";
+        try { $message .= ' - ' . $response->decoded_content->{Error}{'-message'}; }
+        catch { $message .= ' - Unknown'; }
         VMware::vCloudDirector::Error->throw(
-            {   message  => "$method request failed",
+            {   message  => $message,
                 uri      => $uri,
                 request  => $request,
                 response => $response
