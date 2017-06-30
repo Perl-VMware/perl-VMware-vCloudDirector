@@ -19,7 +19,7 @@ use Mozilla::CA;
 use Path::Tiny;
 use Ref::Util qw(is_plain_hashref);
 use Scalar::Util qw(looks_like_number);
-use Syntax::Keyword::Try;
+use Syntax::Keyword::Try 0.04;    # Earlier versions throw errors
 use VMware::vCloudDirector::Error;
 use VMware::vCloudDirector::Object;
 use XML::Fast qw();
