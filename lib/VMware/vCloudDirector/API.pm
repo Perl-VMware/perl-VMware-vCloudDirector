@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use v5.10;    # needed for state variable
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 our $AUTHORITY = 'cpan:NIGELM'; # AUTHORITY
 
 use Moose;
@@ -19,7 +19,7 @@ use Mozilla::CA;
 use Path::Tiny;
 use Ref::Util qw(is_plain_hashref);
 use Scalar::Util qw(looks_like_number);
-use Syntax::Keyword::Try;
+use Syntax::Keyword::Try 0.04;    # Earlier versions throw errors
 use VMware::vCloudDirector::Error;
 use VMware::vCloudDirector::Object;
 use XML::Fast qw();
@@ -444,7 +444,7 @@ VMware::vCloudDirector::API - Module to do stuff!
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head2 Attributes
 
