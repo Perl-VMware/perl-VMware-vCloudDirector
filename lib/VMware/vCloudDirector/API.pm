@@ -227,9 +227,15 @@ method _request ($method, $url, $content?, $headers?) {
 
     # Throw if this went wrong
     if ( $response->is_error ) {
-        my $message = "$method request failed";
-        try { $message .= ' - ' . $response->decoded_content->{Error}{'-message'}; }
-        catch { $message .= ' - Unknown'; }
+        my $message = "$method request failed [$uri] - ";
+        try {
+            my $decoded_response = $self->_decode_xml_response($response);
+            $message .=
+                ( exists( $decoded_response->{Error}{'-message'} ) )
+                ? $decoded_response->{Error}{'-message'}
+                : 'Unknown after decode';
+        }
+        catch { $message .= 'Unknown'; }
         VMware::vCloudDirector::Error->throw(
             {   message  => $message,
                 uri      => $uri,
