@@ -11,7 +11,7 @@ VMware::vCloudDirector - Interface to VMWare vCloud Directory REST API
 
 # VERSION
 
-version 0.007
+version 0.008
 
 # SYNOPSIS
 
