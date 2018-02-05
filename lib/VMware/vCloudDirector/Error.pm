@@ -2,9 +2,6 @@ package VMware::vCloudDirector::Error;
 
 # ABSTRACT: Throw errors with the best of them
 
-use strict;
-use warnings;
-
 # VERSION
 # AUTHORITY
 

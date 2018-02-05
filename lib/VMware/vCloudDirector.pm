@@ -2,9 +2,6 @@ package VMware::vCloudDirector;
 
 # ABSTRACT: Interface to VMWare vCloud Directory REST API
 
-use strict;
-use warnings;
-
 # VERSION
 # AUTHORITY
 

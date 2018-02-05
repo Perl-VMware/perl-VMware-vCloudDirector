@@ -2,8 +2,6 @@ package VMware::vCloudDirector::API;
 
 # ABSTRACT: Module to do stuff!
 
-use strict;
-use warnings;
 use v5.10;    # needed for state variable
 
 # VERSION

@@ -2,9 +2,6 @@ package VMware::vCloudDirector::ObjectContent;
 
 # ABSTRACT: A vCloud Object content
 
-use strict;
-use warnings;
-
 # VERSION
 # AUTHORITY
 

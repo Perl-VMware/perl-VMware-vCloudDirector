@@ -2,9 +2,6 @@ package VMware::vCloudDirector::Object;
 
 # ABSTRACT: Module to contain an object!
 
-use strict;
-use warnings;
-
 # VERSION
 # AUTHORITY
 

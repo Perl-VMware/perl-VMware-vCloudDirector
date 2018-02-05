@@ -2,9 +2,6 @@ package VMware::vCloudDirector::Link;
 
 # ABSTRACT: Link within the vCloud
 
-use strict;
-use warnings;
-
 # VERSION
 # AUTHORITY
 
