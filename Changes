@@ -1,6 +1,9 @@
 Revision history for VMware-vCloudDirector
 
 {{$NEXT}}
+    - Uses LWP::UserAgent::Determined for better error retry capability
+    - Uses proxy configuration from environment variables
+      [This should possibly be configurable]
 
 0.007     2017-08-17 11:07:41+01:00 Europe/London
     - Slightly improved error handling - decodes vCloud response better
